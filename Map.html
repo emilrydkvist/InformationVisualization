@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+    <script type="text/javascript" src="js/d3.min.js"></script>
+        <!--<script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlfMpg6jb1Vk5LhmbR_fCMXn9NBOBwWoA&sensor=false">
+    </script>-->
+    <script type="text/javascript">
+      function initialize() {
+
+        var startPos = new google.maps.LatLng(45.559654, 9.255338);
+        var endPos = new google.maps.LatLng(45.559734, 9.255475);
+        var furthestPos = new google.maps.LatLng(45.548267, 9.239025);
+        var mapOptions = {
+          center: startPos,
+          zoom: 12
+        };
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+
+        var startMarker = new google.maps.Marker({
+        position: startPos,
+        map: map,
+        title: 'Starting position!'
+        });
+
+        var endMarker = new google.maps.Marker({
+        position: endPos,
+        map: map,
+        title: 'Ending position!'
+        });
+
+        var furthestMarker = new google.maps.Marker({
+        position: furthestPos,
+        map: map,
+        title: 'Furthest position!',
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 7
+        }
+        });
+
+      }
+
+        function loadScript() {
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAlfMpg6jb1Vk5LhmbR_fCMXn9NBOBwWoA&sensor=false&' +
+              'callback=initialize';
+          document.body.appendChild(script);
+        }
+
+        window.onload = loadScript;
+
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+  </body>
+</html>
