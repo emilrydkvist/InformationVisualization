@@ -17,7 +17,11 @@ function readData(data)
 		carInfo['lat'] = data[i]['lat'];
 		carInfo['lon'] = data[i]['lon'];
 		
-		carData[data[i]['T_ID']].push(carInfo);
+		var temp = [];
+		temp = carData[data[i]['T_ID']] || [];
+		temp.push(carInfo);
+		
+		carData[data[i]['T_ID']] = temp;
 	}
 	
 	return carData;
