@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+    <!--<script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3Y_z1NJv4bw5RpU0dglIegtfwRJRNaOY&sensor=true">
+    </script>-->
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<!--<script src="js/d3.min.js"></script>-->
+	<script src="js/readData.js"></script>
+	
+	
+    <script type="text/javascript">
+      function initialize() {
+		var self = this;
+		
+		
+        var mapOptions = {
+          center: new google.maps.LatLng(45.559734, 9.255475),
+          zoom: 12
+        };
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+			
+		var dsv = d3.dsv(";","text/plain");
+		
+		dsv("data/Milan_Car_Trajectories.csv", function(data) {
+			
+			self.data = data;
+		
+			var carData = readData(data);
+			
+			
+		});
+		
+			
+			
+      }
+	  
+	  function loadScript() {
+		  var script = document.createElement('script');
+		  script.type = 'text/javascript';
+		  script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyC3Y_z1NJv4bw5RpU0dglIegtfwRJRNaOY&sensor=false&' +
+			  'callback=initialize';
+		  document.body.appendChild(script);
+		}
+
+	window.onload = loadScript;
+
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"/>
+	
+	
+  </body>
+</html>
