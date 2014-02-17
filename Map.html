@@ -8,34 +8,43 @@
       #map-canvas { height: 100% }
     </style>
     <script type="text/javascript" src="js/d3.min.js"></script>
-        <!--<script type="text/javascript"
+    <script type="text/javascript" src="js/readData.js"></script>
+    <!--<script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlfMpg6jb1Vk5LhmbR_fCMXn9NBOBwWoA&sensor=false">
     </script>-->
     <script type="text/javascript">
       function initialize() {
 
+        //Positioner som ska ritas ut på kartan
         var startPos = new google.maps.LatLng(45.559654, 9.255338);
         var endPos = new google.maps.LatLng(45.559734, 9.255475);
         var furthestPos = new google.maps.LatLng(45.548267, 9.239025);
+
+
+        //Ange egenskaper för kartan
         var mapOptions = {
           center: startPos,
           zoom: 12
         };
+        //Kartan ritas ut
         var map = new google.maps.Map(document.getElementById("map-canvas"),
             mapOptions);
 
+        //Startposition
         var startMarker = new google.maps.Marker({
         position: startPos,
         map: map,
         title: 'Starting position!'
         });
 
+        //Slutposition
         var endMarker = new google.maps.Marker({
         position: endPos,
         map: map,
         title: 'Ending position!'
         });
 
+        //Positionen längt ifrån startpositionen
         var furthestMarker = new google.maps.Marker({
         position: furthestPos,
         map: map,
@@ -45,6 +54,21 @@
           scale: 7
         }
         });
+
+        //Koordinaterna för path
+        var coordinates = [startPos, furthestPos];
+
+        //Pathen som ska ritas ut på kartan
+        var path = new google.maps.Polyline({
+          path: coordinates,
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 4
+        });
+
+        //Pathen ritas ut
+        path.setMap(map);
 
       }
 
@@ -56,6 +80,7 @@
           document.body.appendChild(script);
         }
 
+        //Laddar kartan när sidan har laddat klart
         window.onload = loadScript;
 
     </script>
