@@ -1,7 +1,6 @@
 
 function readData(data)
 {
-	console.log(data[1]['E_ID']);
 	
 	var carData = [];
 	
@@ -23,6 +22,7 @@ function readData(data)
 		
 		carData[data[i]['T_ID']] = temp;
 	}
+	console.log(carData);
 	
 	return carData;
 	
