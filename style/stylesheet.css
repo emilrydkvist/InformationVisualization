@@ -21,8 +21,9 @@ body {
 	margin-top: 0px;
 	position: absolute;
 	z-index: 0;
-	top: 10px
-
+	top: 0px;
+	margin: 5px;
+	
 }
 
 #clearButton {
