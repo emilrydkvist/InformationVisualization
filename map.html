@@ -58,7 +58,7 @@
 			//Initializing map
 			var mapOptions = {
 			  center: new google.maps.LatLng(45.450497, 9.187317),
-			  zoom: 12
+			  zoom: 11
 			};
 			map = new google.maps.Map(document.getElementById("map-canvas"),
 				mapOptions);
@@ -73,9 +73,16 @@
 		
 		function drawpaths(carData)
 		{
+			var lineSymbol = {
+				path: google.maps.SymbolPath.CIRCLE,
+				scale: 3,
+				strokeColor: '#000'
+			};
+			
+			
 			var paths = [];
 			
-			for (var i=1; i<carData.length; i++)
+			for (var i=1; i<40; i++)
 			{
 				var trajectory = [];
 				
@@ -90,20 +97,36 @@
 			{
 				var path = new google.maps.Polyline({
 				  path: paths[i],
+				  icons: [{icon: lineSymbol, offset: '100%'}],
 				  geodesic: true,
-				  strokeColor: '#0000FF',//'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
+				  strokeColor: '#FFF',//'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
 				  strokeOpacity: 0.2,
-				  strokeWeight: 2
+				  strokeWeight: 2,
+				  map: map
 				});
 
 				//Pathen ritas ut
-				path.setMap(map);
 				overlays.push(path);
+				animateCircle(path);
 				
+			}
+			
+			function animateCircle(path) {
+				var count = 0;
+				window.setInterval(function() {
+				  count = (count + 1) % 200;
+
+				  var icons = path.get('icons');
+				  icons[0].offset = (count / 2) + '%';
+				  path.set('icons', icons);
+			}, 20);
 			}
 				
 		}
-		  
+		
+		
+		
+		
 		  
 		function loadScript() {
 		  var script = document.createElement('script');
