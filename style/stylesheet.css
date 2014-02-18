@@ -1,7 +1,34 @@
 html { height: 100% }
-body { height: 100%; margin: 0; padding: 0 }
+body { 
+	height: 100%; 
+	margin: 0; 
+	padding: 0; 
+	background-color: #FF0000;
+}
+#container {
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #0F0;
+	height: 100%;
+}
 
 #map-canvas {
-	height: 50%;
-	width: 50%;	
+
+	height: 400px;
+	width: 600px;
+	background-color: #0000FF;
+	margin-top: 0px;
+	position: absolute;
+	z-index: 0;
+	top: 10px
+
+}
+
+#clearButton {
+	margin-top: 500px;
+	z-index: 100;
+	background-color: #0000FF;
+	
+	
 }

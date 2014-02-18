@@ -2,72 +2,100 @@
 <html>
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-	<!--<script src="js/d3.min.js"></script>-->
-	<script src="js/readData.js"></script>
 	<link rel="stylesheet" href="style/stylesheet.css" type="text/css"/>
 	
 	
-    <script type="text/javascript">
-      function initialize() {
-		var self = this;
-		
-		var dsv = d3.dsv(";","text/plain");
-		
-		var carData = [];
-		
-		dsv("data/Milan_Car_Trajectories.csv", function(data) {
+    
+  </head>
+  <body>
+  <div id="container">
+  
+    
+	
+	<button id="clearButton" onclick="clearOverlays()">Clear overlays</button>
+	<div id="map-canvas"/>
+	
+	
+  </div>
+  </body>
+  
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="js/readData.js"></script>
+  
+	<script type="text/javascript">
 			
-			self.data = data;
+		var overlays = [];
 		
-			carData = readData(data);
-			 
-			drawmap(carData);
-		});
-		
-		function drawmap(carData)
+		function clearOverlays()
 		{
-			var mapOptions = {
-			  center: new google.maps.LatLng(45.450497, 9.187317),
-			  zoom: 11
-			};
-			var map = new google.maps.Map(document.getElementById("map-canvas"),
-				mapOptions);
-				
-				
-			var paths = [];
-			
-			for (var i=1; i<carData.length; i++)
-			{
-				var trajectory = [];
-				
-				for(var j=0; j<carData[i].length; j++)
-				{
-					trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-				}
-				paths.push(trajectory);
-			}
-			
-			for(var i=0; i<paths.length; i++)
-			{
-				var path = new google.maps.Polyline({
-				  path: paths[i],
-				  geodesic: true,
-				  strokeColor: '#0000FF',//'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
-				  strokeOpacity: 0.2,
-				  strokeWeight: 2
-				});
 
-				//Pathen ritas ut
-				path.setMap(map);
-				
+			while(overlays[0])
+			{
+				overlays.pop().setMap(null);
 			}
-				
 		}
 			
-      }
-	  
-	  function loadScript() {
+		function initialize() {
+			var self = this;
+			
+			var dsv = d3.dsv(";","text/plain");
+			
+			var carData = [];
+			
+			dsv("data/Milan_Car_Trajectories.csv", function(data) {
+				
+				self.data = data;
+			
+				carData = readData(data);
+				 
+				drawmap(carData);
+			});
+			
+			function drawmap(carData)
+			{
+				var mapOptions = {
+				  center: new google.maps.LatLng(45.450497, 9.187317),
+				  zoom: 12
+				};
+				var map = new google.maps.Map(document.getElementById("map-canvas"),
+					mapOptions);
+					
+					
+				var paths = [];
+				
+				for (var i=1; i<carData.length; i++)
+				{
+					var trajectory = [];
+					
+					for(var j=0; j<carData[i].length; j++)
+					{
+						trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+					}
+					paths.push(trajectory);
+				}
+				
+				for(var i=0; i<paths.length; i++)
+				{
+					var path = new google.maps.Polyline({
+					  path: paths[i],
+					  geodesic: true,
+					  strokeColor: '#0000FF',//'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
+					  strokeOpacity: 0.2,
+					  strokeWeight: 2
+					});
+
+					//Pathen ritas ut
+					path.setMap(map);
+					overlays.push(path);
+					
+				}
+					
+			}
+			
+				
+		}
+		  
+		function loadScript() {
 		  var script = document.createElement('script');
 		  script.type = 'text/javascript';
 		  script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyC3Y_z1NJv4bw5RpU0dglIegtfwRJRNaOY&sensor=false&' +
@@ -75,13 +103,8 @@
 		  document.body.appendChild(script);
 		}
 
-	window.onload = loadScript;
+		window.onload = loadScript;
 
     </script>
-  </head>
-  <body>
-    <div id="map-canvas"/>
-	
-	
-  </body>
+  
 </html>
