@@ -26,6 +26,7 @@
 			
 		var overlays = [];
 		var carData = [];
+		drawBrush();
 		
 		//function to clear all overlays on the map
 		//each time an overlay is created it has to be added to the array overlays
@@ -99,14 +100,35 @@
 				}
 				
 			}
-			//Function for drawing brush
-			function drawBrush(carData)
+			
+				
+		}
+
+		//Function for drawing brush
+			function drawBrush()
 			{
+				//Create scale 
+				var timeScale = d3.scale.linear()
+					.domain([0, 22])  //input domain
+					.range([0, 500]); //output range
+
+				//Define axis
+				var timeAxis = d3.svg.axis()
+					.scale(timeScale)
+					.orient("bottom");
+
+				//Create SVG element
+				var svg = d3.select("#container")
+					.append("svg")
+					.attr("width", 500)
+					.attr("height", 15);
+
+				//Create axis
+				svg.append("g")
+					.call(timeAxis);
 
 
 			}
-				
-		}
 		  
 		function loadScript() {
 		  var script = document.createElement('script');
