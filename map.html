@@ -44,7 +44,7 @@
 				
 			var paths = [];
 			
-			for (var i=1; i<100; i++)
+			for (var i=1; i<carData.length; i++)
 			{
 				var trajectory = [];
 				
@@ -60,9 +60,9 @@
 				var path = new google.maps.Polyline({
 				  path: paths[i],
 				  geodesic: true,
-				  strokeColor: 'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
-				  strokeOpacity: 1.0,
-				  strokeWeight: 3
+				  strokeColor: '#0000FF',//'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
+				  strokeOpacity: 0.2,
+				  strokeWeight: 2
 				});
 
 				//Pathen ritas ut
