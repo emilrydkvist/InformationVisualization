@@ -2,17 +2,10 @@
 <html>
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <style type="text/css">
-      html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0 }
-      #map-canvas { height: 100% }
-    </style>
-    <!--<script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3Y_z1NJv4bw5RpU0dglIegtfwRJRNaOY&sensor=true">
-    </script>-->
-	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 	<!--<script src="js/d3.min.js"></script>-->
 	<script src="js/readData.js"></script>
+	<link rel="stylesheet" href="style/stylesheet.css" type="text/css"/>
 	
 	
     <script type="text/javascript">
@@ -35,7 +28,7 @@
 		function drawmap(carData)
 		{
 			var mapOptions = {
-			  center: new google.maps.LatLng(45.559734, 9.255475),
+			  center: new google.maps.LatLng(45.450497, 9.187317),
 			  zoom: 12
 			};
 			var map = new google.maps.Map(document.getElementById("map-canvas"),
