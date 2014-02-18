@@ -22,7 +22,6 @@ function readData(data)
 		
 		carData[data[i]['T_ID']] = temp;
 	}
-	console.log(carData);
 	
 	return carData;
 	
