@@ -27,6 +27,8 @@
 		var overlays = [];
 		var carData = [];
 		
+		//function to clear all overlays on the map
+		//each time an overlay is created it has to be added to the array overlays
 		function clearOverlays()
 		{
 
@@ -36,9 +38,10 @@
 			}
 		}
 		
+		//creating datareader with delimiter ';'
 		var dsv = d3.dsv(";","text/plain");
 			
-				
+		//reading data from file and storing in carData
 		dsv("data/Milan_Car_Trajectories.csv", function(data) {
 			
 			self.data = data;
@@ -52,20 +55,20 @@
 		function initialize() {
 			var self = this;
 			
+			//Initializing map
+			var mapOptions = {
+			  center: new google.maps.LatLng(45.450497, 9.187317),
+			  zoom: 12
+			};
+			var map = new google.maps.Map(document.getElementById("map-canvas"),
+				mapOptions);
+			
+			
 			//function to initialize map and draw data on map
-			drawmap(carData);
+			drawpaths(carData);
 			
-			
-			function drawmap(carData)
+			function drawpaths(carData)
 			{
-				var mapOptions = {
-				  center: new google.maps.LatLng(45.450497, 9.187317),
-				  zoom: 12
-				};
-				var map = new google.maps.Map(document.getElementById("map-canvas"),
-					mapOptions);
-					
-					
 				var paths = [];
 				
 				for (var i=1; i<carData.length; i++)
