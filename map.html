@@ -26,6 +26,7 @@
 			
 		var overlays = [];
 		var carData = [];
+		var map;
 		
 		//function to clear all overlays on the map
 		//each time an overlay is created it has to be added to the array overlays
@@ -59,47 +60,50 @@
 			  center: new google.maps.LatLng(45.450497, 9.187317),
 			  zoom: 12
 			};
-			var map = new google.maps.Map(document.getElementById("map-canvas"),
+			map = new google.maps.Map(document.getElementById("map-canvas"),
 				mapOptions);
-			
-			
+				
+				
 			//function to initialize map and draw data on map
 			drawpaths(carData);
+				
+		}
+		
+		
+		
+		function drawpaths(carData)
+		{
+			var paths = [];
 			
-			function drawpaths(carData)
+			for (var i=1; i<carData.length; i++)
 			{
-				var paths = [];
+				var trajectory = [];
 				
-				for (var i=1; i<carData.length; i++)
+				for(var j=0; j<carData[i].length; j++)
 				{
-					var trajectory = [];
-					
-					for(var j=0; j<carData[i].length; j++)
-					{
-						trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-					}
-					paths.push(trajectory);
+					trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
 				}
-				
-				for(var i=0; i<paths.length; i++)
-				{
-					var path = new google.maps.Polyline({
-					  path: paths[i],
-					  geodesic: true,
-					  strokeColor: '#0000FF',//'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
-					  strokeOpacity: 0.2,
-					  strokeWeight: 2
-					});
+				paths.push(trajectory);
+			}
+			
+			for(var i=0; i<paths.length; i++)
+			{
+				var path = new google.maps.Polyline({
+				  path: paths[i],
+				  geodesic: true,
+				  strokeColor: '#0000FF',//'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
+				  strokeOpacity: 0.2,
+				  strokeWeight: 2
+				});
 
-					//Pathen ritas ut
-					path.setMap(map);
-					overlays.push(path);
-					
-				}
-					
+				//Pathen ritas ut
+				path.setMap(map);
+				overlays.push(path);
+				
 			}
 				
 		}
+		  
 		  
 		function loadScript() {
 		  var script = document.createElement('script');
