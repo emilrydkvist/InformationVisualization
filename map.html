@@ -69,11 +69,14 @@
 				
 		}
 		
-		//drawBrush();
+		//Drawing the time line
+		drawBrush();
 		
 		
 		function drawpaths(carData)
 		{
+			if(carData==[]) return;
+
 			var lineSymbol = {
 				path: google.maps.SymbolPath.CIRCLE,
 				scale: 3,
@@ -116,29 +119,51 @@
 		}
 
 		//Function for drawing brush
-		/*function drawBrush()
+		function drawBrush()
 		{
 			//Create scale 
 			var timeScale = d3.scale.linear()
 				.domain([0, 22])  //input domain
-				.range([0, 550]); //output range
+				.range([0, 500]); //output range
 
 			//Define axis
 			var timeAxis = d3.svg.axis()
 				.scale(timeScale)
-				.orient("bottom");
+				.orient("bottom")
+				.ticks(11);
 
 			//Create SVG element
 			var svg = d3.select("#container")
 				.append("svg")
-				.attr("width", 550)
-				.attr("height", 25);
+				.attr("width", 525)
+				.attr("height", 30);
 
 			//Create axis
 			svg.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(5,0)")
 				.call(timeAxis);
 
-			}*/
+			//Create brush
+			var brush = d3.svg.brush();
+			brush.x(timeScale)
+			brush(svg)
+			svg.selectAll("rect").attr("height", 16)
+			/*svg.selectAll(".background")
+				.style({fill: "#fff", visibility: "visible"})*/
+			svg.selectAll(".extent")
+				.style({fill: "rgba(0,0,0,0.3)", visibility: "visible"})
+			svg.selectAll(".reseize rect")
+				.style({fill: "#000", visibility: "visible"})
+
+			var ext;
+			brush.on("brush", function(){
+				ext = brush.extent()
+				console.log(ext);
+				return ext;
+			})
+
+			}
 		  
 			function animateCircle(path) {
 				var count = 0;

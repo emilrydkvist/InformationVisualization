@@ -42,3 +42,16 @@ body {
 	padding-left: 10px;
 	padding-right: 10px;
 }
+
+.axis path, .axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 12px;
+}
