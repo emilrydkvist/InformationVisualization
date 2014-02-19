@@ -150,9 +150,18 @@
 				//path.setMap(map);
 				overlays.push(path);
 				animateCircle(path);
-			}
+			}	
+		}
+		
+		function animateCircle(path) {
+			var count = 0;
+			window.setInterval(function() {
+			  count = (count + 1) % 200;
 
-				
+			  var icons = path.get('icons');
+			  icons[0].offset = (count / 2) + '%';
+			  path.set('icons', icons);
+			}, 30);
 		}
 
 		//Function for drawing brush
@@ -201,16 +210,7 @@
 
 		}
 		  
-		function animateCircle(path) {
-			var count = 0;
-			window.setInterval(function() {
-			  count = (count + 1) % 200;
-
-			  var icons = path.get('icons');
-			  icons[0].offset = (count / 2) + '%';
-			  path.set('icons', icons);
-			}, 30);
-		}
+		
 		
     </script>
   
