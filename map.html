@@ -9,10 +9,8 @@
   </head>
   <body>
   <div id="container">
-  
-    
-	
-	<button id="clearButton" onclick="animatePaths()">Clear overlays</button>
+	<button id="clearButton" onclick="animatePaths()">Animate cars</button>
+
 	<div id="map-canvas"/>
 	
 	
@@ -30,15 +28,17 @@
 		google.maps.event.addDomListener(window, 'load', initialize);
 			
 		var overlays = [];
-		var carData = [];
+		var carData = [];		
 		var map;
 		var hourMin = 0;
 		var hourMax = 0;
 		
+
 		//function to clear all overlays on the map
 		//each time an overlay is created it has to be added to the array overlays
 		function clearOverlays()
 		{
+
 			while(overlays[0])
 			{
 				overlays.pop().setMap(null);
@@ -59,6 +59,9 @@
 				
 		}
 		
+		//Drawing the time line
+		drawBrush();
+
 		//creating datareader with delimiter ';'
 		var dsv = d3.dsv(";","text/plain");
 			
@@ -73,14 +76,9 @@
 
 			drawpaths(carData);
 		});
-			
-		
-		
-		
-		
+
 		function drawpaths(carData)
 		{
-
 			var paths = [];
 			
 			for (var i=1; i<carData.length; i++)
@@ -152,21 +150,68 @@
 				//path.setMap(map);
 				overlays.push(path);
 				animateCircle(path);
-			}
-			
-			function animateCircle(path) {
-				var count = 0;
-				window.setInterval(function() {
-				  count = (count + 1) % 200;
-
-				  var icons = path.get('icons');
-				  icons[0].offset = (count / 2) + '%';
-				  path.set('icons', icons);
-				}, 30);
-			}
+			}	
 		}
 		
+		function animateCircle(path) {
+			var count = 0;
+			window.setInterval(function() {
+			  count = (count + 1) % 200;
 
+			  var icons = path.get('icons');
+			  icons[0].offset = (count / 2) + '%';
+			  path.set('icons', icons);
+			}, 30);
+		}
+
+		//Function for drawing brush
+		function drawBrush()
+		{
+			//Create scale 
+			var timeScale = d3.scale.linear()
+				.domain([0, 22])  //input domain
+				.range([0, 500]); //output range
+
+			//Define axis
+			var timeAxis = d3.svg.axis()
+				.scale(timeScale)
+				.orient("bottom")
+				.ticks(11);
+
+			//Create SVG element
+			var svg = d3.select("#container")
+				.append("svg")
+				.attr("width", 525)
+				.attr("height", 30);
+
+			//Create axis
+			svg.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(5,0)")
+				.call(timeAxis);
+
+			//Create brush
+			var brush = d3.svg.brush();
+			brush.x(timeScale)
+			brush(svg)
+			svg.selectAll("rect").attr("height", 16)
+			/*svg.selectAll(".background")
+				.style({fill: "#fff", visibility: "visible"})*/
+			svg.selectAll(".extent")
+				.style({fill: "rgba(0,0,0,0.3)", visibility: "visible"})
+			svg.selectAll(".reseize rect")
+				.style({fill: "#000", visibility: "visible"})
+
+			var ext;
+			brush.on("brush", function(){
+				ext = brush.extent()
+				return ext;
+			})
+
+		}
+		  
+		
+		
     </script>
   
 </html>
