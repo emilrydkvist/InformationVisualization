@@ -12,21 +12,28 @@
   
     
 	
-	<button id="clearButton" onclick="clearOverlays()">Clear overlays</button>
+	<button id="clearButton" onclick="animatePaths()">Clear overlays</button>
 	<div id="map-canvas"/>
 	
 	
   </div>
   </body>
-  
+  	
+  	<script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3Y_z1NJv4bw5RpU0dglIegtfwRJRNaOY&sensor=true">
+    </script>
+
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 	<script src="js/readData.js"></script>
   
 	<script type="text/javascript">
+		google.maps.event.addDomListener(window, 'load', initialize);
 			
 		var overlays = [];
 		var carData = [];
 		var map;
+		var hourMin = 0;
+		var hourMax = 0;
 		
 		//function to clear all overlays on the map
 		//each time an overlay is created it has to be added to the array overlays
@@ -37,21 +44,8 @@
 				overlays.pop().setMap(null);
 			}
 		}
-		
-		//creating datareader with delimiter ';'
-		var dsv = d3.dsv(";","text/plain");
-			
-		//reading data from file and storing in carData
-		dsv("data/Milan_Car_Trajectories.csv", function(data) {
-			
-			self.data = data;
-		
-			carData = readData(data);
-			 
-			
-		});
-		
-			
+
+
 		function initialize() {
 			var self = this;
 			
@@ -63,26 +57,75 @@
 			map = new google.maps.Map(document.getElementById("map-canvas"),
 				mapOptions);
 				
-				
-			//function to initialize map and draw data on map
-			drawpaths(carData);
-				
 		}
+		
+		//creating datareader with delimiter ';'
+		var dsv = d3.dsv(";","text/plain");
+			
+		//reading data from file and storing in carData
+		var carData = [];
+		dsv("data/Milan_Car_Trajectories.csv", function(data) {
+		
+			carData = readData(data);
+
+			hourMax = d3.max(data, function(d){return Number(d['hour']);});
+			hourMin = d3.min(data, function(d){return Number(d['hour']);});
+
+			drawpaths(carData);
+		});
+			
+		
 		
 		
 		
 		function drawpaths(carData)
 		{
-			var lineSymbol = {
-				path: google.maps.SymbolPath.CIRCLE,
-				scale: 3,
-				strokeColor: '#000'
-			};
-			
-			
+
 			var paths = [];
 			
-			for (var i=1; i<40; i++)
+			for (var i=1; i<carData.length; i++)
+			{
+				var trajectory = [];
+				
+				for(var j=0; j<carData[i].length; j++)
+				{
+					trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+				}
+				paths.push(trajectory);
+			}
+			
+			for(var i=0; i<paths.length; i++)
+			{
+				var path = new google.maps.Polyline({
+				  path: paths[i],
+				  geodesic: true,
+				  strokeColor: '#00F',
+				  strokeOpacity: 0.2,
+				  strokeWeight: 1,
+				});
+
+				//Pathen ritas ut
+				path.setMap(map);
+				overlays.push(path);
+			}
+				
+		}
+		
+
+		function animatePaths(){
+
+			clearOverlays();
+
+			var lineSymbol = {
+				path: google.maps.SymbolPath.CIRCLE,
+				scale: 2,
+				strokeColor: '#000',
+				strokeOpacity: 1
+			};
+
+			var paths = [];
+			
+			for (var i=1; i<100; i++)
 			{
 				var trajectory = [];
 				
@@ -99,16 +142,16 @@
 				  path: paths[i],
 				  icons: [{icon: lineSymbol, offset: '100%'}],
 				  geodesic: true,
-				  strokeColor: '#FFF',//'rgb(' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ', ' + Math.floor(Math.random()*256) + ')',
-				  strokeOpacity: 0.2,
-				  strokeWeight: 2,
-				  map: map
+				  strokeColor: '#00F',
+				  strokeOpacity: 0,
+				  strokeWeight: 1,
+				  map: map,
 				});
 
 				//Pathen ritas ut
+				//path.setMap(map);
 				overlays.push(path);
 				animateCircle(path);
-				
 			}
 			
 			function animateCircle(path) {
@@ -119,13 +162,10 @@
 				  var icons = path.get('icons');
 				  icons[0].offset = (count / 2) + '%';
 				  path.set('icons', icons);
-			}, 20);
+			}, 30);
 			}
-				
+
 		}
-		
-		
-		
 		
 		  
 		function loadScript() {
@@ -136,7 +176,7 @@
 		  document.body.appendChild(script);
 		}
 
-		window.onload = loadScript;
+		
 
     </script>
   
