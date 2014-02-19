@@ -185,7 +185,7 @@
 			var brush = d3.svg.brush();
 			brush.x(timeScale)
 			brush(svg)
-			svg.selectAll("rect").attr("height", 16)
+			svg.selectAll("rect").attr("height", 16).attr("transform", "translate(5,0)")
 			/*svg.selectAll(".background")
 				.style({fill: "#fff", visibility: "visible"})*/
 			svg.selectAll(".extent")
