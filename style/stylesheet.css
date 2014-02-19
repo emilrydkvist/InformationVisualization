@@ -33,3 +33,12 @@ body {
 	
 	
 }
+
+#brush {
+	
+	margin-top: 500px;
+	background-color: #FF00FF;
+	margin-left: 100px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
