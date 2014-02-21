@@ -110,6 +110,43 @@
 		}
 		
 
+		function drawPathTime(hourMin, hourMax){
+			clearOverlays();
+
+			var paths = [];
+			
+			for (var i=1; i<carData.length; i++)
+			{
+				var trajectory = [];
+				
+				for(var j=0; j<carData[i].length; j++)
+				{
+
+					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
+					{
+						trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));
+					}	
+				}
+				paths.push(trajectory);
+			}
+			
+			for(var i=0; i<paths.length; i++)
+			{
+				var path = new google.maps.Polyline({
+				  path: paths[i],
+				  geodesic: true,
+				  strokeColor: '#00F',
+				  strokeOpacity: 0.2,
+				  strokeWeight: 1,
+				});
+
+				//Pathen ritas ut
+				path.setMap(map);
+				overlays.push(path);
+			}
+		}
+
+
 		function animatePaths(){
 
 			clearOverlays();
@@ -147,19 +184,18 @@
 				});
 
 				//Pathen ritas ut
-				//path.setMap(map);
 				overlays.push(path);
 				animateCircle(path);
 			}	
 		}
-		
+
 		function animateCircle(path) {
 			var count = 0;
 			window.setInterval(function() {
 			  count = (count + 1) % 200;
 
 			  var icons = path.get('icons');
-			  icons[0].offset = (count / 2) + '%';
+			  icons[0].offset = (count / 3) + '%';
 			  path.set('icons', icons);
 			}, 30);
 		}
@@ -203,11 +239,10 @@
 				.style({fill: "#000", visibility: "visible"})
 			
 			var ext;
-			brush.on("brush", function(){
-				ext = brush.extent()
-				console.log(ext);
+			brush.on("brushend", function(){
+				ext = brush.extent();
+				drawPathTime(ext[0], ext[1]);
 				return ext;
-
 			})
 
 		}
