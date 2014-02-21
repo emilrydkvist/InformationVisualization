@@ -12,6 +12,7 @@
 	<button id="clearButton" onclick="animatePaths()">Animate cars</button>
 	<button id="clearButton" onclick="drawPathSpeed()">Show car speed</button>
 	<button id="clearButton" onclick="drawpaths()">Show all paths</button>
+	<button id="clearButton" onclick="drawPathDir()">Direction</button>
 
 	<div id="map-canvas"/>
 	
@@ -259,6 +260,24 @@
 			}, 30);
 		}
 
+		//Function for drawing trajectorys that has a specified direction
+		function drawPathDir(direction)
+		{
+			for(var i = 1; i<carData.length; i++)
+			{
+				for(var j = 0; j <(carData[i].length - 1); j++)
+				{
+					//if(raden under == E) trajectoryEast.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']))
+					console.log(checkDirection(carData[i][j]['lat'], carData[i+1][j]['lat'], carData[i][j]['lon'], carData[i+1][j]['lon']));
+					//Same for outher directions
+				}
+			}
+
+			var paths = [];
+
+
+		}
+
 		//Function for drawing brush
 		function drawBrush()
 		{
@@ -306,7 +325,7 @@
 
 		}
 
-		function getDirection(lat1, lat2, lon1, lon2)
+		function checkDirection(lat1, lat2, lon1, lon2)
 		{
 			var Direction;
 
@@ -319,29 +338,29 @@
 			if(latDirDiff > threshold)
 			{
 				if(latDirDiff > 0)
-					Direction = N;
+					Direction = "N";
 				else
-					Direction = S;
+					Direction = "S";
 			}
 			
 			else if(lonDirDiff > threshold)
 			{
 				if(lonDirDiff > 0)
-					Direction = E;
+					Direction = "E";
 				else
-					Direction = W;
+					Direction = "W";
 			}
 
 			else
 			{
 				if(latDiff > 0 && lonDiff > 0)
-					Direction = NE;
+					Direction = "NE";
 				else if(latDiff > 0 && lonDiff < 0)
-					Direction = NW;
+					Direction = "NW";
 				else if(latDiff < 0 && lonDiff > 0)
-					Direction = SE;
+					Direction = "SE";
 				else if(latDiff < 0 && lonDiff < 0)
-					Direction = SW;
+					Direction = "SW";
 			}
 
 			return Direction;
