@@ -30,9 +30,6 @@
 		var overlays = [];
 		var carData = [];		
 		var map;
-		var hourMin = 0;
-		var hourMax = 0;
-		
 
 		//function to clear all overlays on the map
 		//each time an overlay is created it has to be added to the array overlays
@@ -58,6 +55,18 @@
 				mapOptions);
 				
 		}
+
+		function latlonToMeters(lon1, lat1, lon2, lat2){
+			var R = 6378.137; // Radius of earth in KM
+		    var dLat = (lat2 - lat1) * Math.PI / 180;
+		    var dLon = (lon2 - lon1) * Math.PI / 180;
+		    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		    	Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+		    	Math.sin(dLon/2) * Math.sin(dLon/2);
+		    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		    var d = R * c;
+		    return d * 1000; // meters
+		}
 		
 		//Drawing the time line
 		drawBrush();
@@ -66,15 +75,12 @@
 		var dsv = d3.dsv(";","text/plain");
 			
 		//reading data from file and storing in carData
-		var carData = [];
 		dsv("data/Milan_Car_Trajectories.csv", function(data) {
 		
 			carData = readData(data);
 
-			hourMax = d3.max(data, function(d){return Number(d['hour']);});
-			hourMin = d3.min(data, function(d){return Number(d['hour']);});
-
 			drawpaths(carData);
+			drawPathSpeed();
 		});
 
 		function drawpaths(carData)
@@ -107,6 +113,48 @@
 				overlays.push(path);
 			}
 				
+		}
+
+		function drawPathSpeed(){
+
+			clearOverlays();
+
+			for (var i=1; i<carData.length; i++)
+			{
+				for(var j=0; j<(carData[i].length-1); j++)
+				{
+					var paths = [];
+					
+
+					paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+					paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
+
+					var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
+
+					var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
+
+					var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
+
+					var time = Math.abs(Date2-Date1)/1000;
+					
+					var velocity = distance/time;
+
+					console.log(velocity);
+
+					var path = new google.maps.Polyline({
+					  path: paths,
+					  geodesic: true,
+					  strokeColor: '#00F',
+					  strokeOpacity: 0.2,
+					  strokeWeight: 1,
+					});
+
+					//Pathen ritas ut
+					path.setMap(map);
+					overlays.push(path);
+					
+				}
+			}
 		}
 		
 
