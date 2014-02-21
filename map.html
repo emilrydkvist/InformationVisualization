@@ -246,6 +246,27 @@
 			})
 
 		}
+
+		function getDirection(lat1, lat2, lon1, lon2)
+		{
+			var Direction;
+
+			var latDiff = lat2 - lat1;
+			var lonDiff = lon2 - lon2;
+
+			if(latDiff > 0 && lonDiff > 0)
+				Direction = NE;
+			else if(latDiff > 0 && lonDiff < 0)
+				Direction = NW;
+			else if(latDiff < 0 && lonDiff > 0)
+				Direction = SE;
+			else if(latDiff < 0 && lonDiff < 0)
+				Direction = SW;
+
+
+			return Direction;
+
+		}
 		  
 		
 		
