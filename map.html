@@ -301,16 +301,37 @@
 
 			var latDiff = lat2 - lat1;
 			var lonDiff = lon2 - lon2;
+			var latDirDiff = latDiff - lonDiff;
+			var lonDirDiff = lonDiff - latDiff;
+			var threshold = 0.001;
 
-			if(latDiff > 0 && lonDiff > 0)
-				Direction = NE;
-			else if(latDiff > 0 && lonDiff < 0)
-				Direction = NW;
-			else if(latDiff < 0 && lonDiff > 0)
-				Direction = SE;
-			else if(latDiff < 0 && lonDiff < 0)
-				Direction = SW;
+			if(latDirDiff > threshold)
+			{
+				if(latDirDiff > 0)
+					Direction = N;
+				else
+					Direction = S;
+			}
+			
+			else if(lonDirDiff > threshold)
+			{
+				if(lonDirDiff > 0)
+					Direction = E;
+				else
+					Direction = W;
+			}
 
+			else
+			{
+				if(latDiff > 0 && lonDiff > 0)
+					Direction = NE;
+				else if(latDiff > 0 && lonDiff < 0)
+					Direction = NW;
+				else if(latDiff < 0 && lonDiff > 0)
+					Direction = SE;
+				else if(latDiff < 0 && lonDiff < 0)
+					Direction = SW;
+			}
 
 			return Direction;
 
