@@ -137,14 +137,12 @@
 
 					var time = Math.abs(Date2-Date1)/1000;
 					
-					var velocity = distance/time;
-
-					console.log(velocity);
+					var velocity = distance/time*3.6;
 
 					var path = new google.maps.Polyline({
 					  path: paths,
 					  geodesic: true,
-					  strokeColor: '#00F',
+					  strokeColor: velocityToColor(velocity),
 					  strokeOpacity: 0.2,
 					  strokeWeight: 1,
 					});
@@ -157,6 +155,16 @@
 			}
 		}
 		
+		function velocityToColor(velocity){
+			if(velocity < 10)
+				return '#F00';
+			else if(velocity >= 10 && velocity < 50)
+				return '#e59400';
+			else if(velocity >= 50 && velocity < 70)
+				return '#FF0';
+			else
+				return '#0F0';
+		}
 
 		function drawPathTime(hourMin, hourMax){
 			clearOverlays();
