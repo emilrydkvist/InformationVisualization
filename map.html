@@ -194,18 +194,20 @@
 			var brush = d3.svg.brush();
 			brush.x(timeScale)
 			brush(svg)
-			svg.selectAll("rect").attr("height", 16)
+			svg.selectAll("rect").attr("height", 16).attr("transform", "translate(5,0)")
 			/*svg.selectAll(".background")
 				.style({fill: "#fff", visibility: "visible"})*/
 			svg.selectAll(".extent")
 				.style({fill: "rgba(0,0,0,0.3)", visibility: "visible"})
 			svg.selectAll(".reseize rect")
 				.style({fill: "#000", visibility: "visible"})
-
+			
 			var ext;
 			brush.on("brush", function(){
 				ext = brush.extent()
+				console.log(ext);
 				return ext;
+
 			})
 
 		}
