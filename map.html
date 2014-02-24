@@ -10,6 +10,9 @@
   <body>
   <div id="container">
 	<button id="clearButton" onclick="animatePaths()">Animate cars</button>
+	<button id="clearButton" onclick="drawPathSpeed()">Show car speed</button>
+	<button id="clearButton" onclick="drawpaths()">Show all paths</button>
+	<button id="clearButton" onclick="drawPathDir()">Direction</button>
 
 	<div id="map-canvas"/>
 	
@@ -30,9 +33,6 @@
 		var overlays = [];
 		var carData = [];		
 		var map;
-		var hourMin = 0;
-		var hourMax = 0;
-		
 
 		//function to clear all overlays on the map
 		//each time an overlay is created it has to be added to the array overlays
@@ -58,6 +58,18 @@
 				mapOptions);
 				
 		}
+
+		function latlonToMeters(lon1, lat1, lon2, lat2){
+			var R = 6378.137; // Radius of earth in KM
+		    var dLat = (lat2 - lat1) * Math.PI / 180;
+		    var dLon = (lon2 - lon1) * Math.PI / 180;
+		    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		    	Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+		    	Math.sin(dLon/2) * Math.sin(dLon/2);
+		    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		    var d = R * c;
+		    return d * 1000; // meters
+		}
 		
 		//Drawing the time line
 		drawBrush();
@@ -66,19 +78,17 @@
 		var dsv = d3.dsv(";","text/plain");
 			
 		//reading data from file and storing in carData
-		var carData = [];
 		dsv("data/Milan_Car_Trajectories.csv", function(data) {
 		
 			carData = readData(data);
 
-			hourMax = d3.max(data, function(d){return Number(d['hour']);});
-			hourMin = d3.min(data, function(d){return Number(d['hour']);});
-
-			drawpaths(carData);
+			drawpaths();
 		});
 
-		function drawpaths(carData)
+		function drawpaths()
 		{
+			clearOverlays();
+
 			var paths = [];
 			
 			for (var i=1; i<carData.length; i++)
@@ -108,7 +118,57 @@
 			}
 				
 		}
+
+		function drawPathSpeed(){
+
+			clearOverlays();
+
+			for (var i=1; i<carData.length; i++)
+			{
+				for(var j=0; j<(carData[i].length-1); j++)
+				{
+					var paths = [];
+					
+
+					paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+					paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
+
+					var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
+
+					var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
+
+					var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
+
+					var time = Math.abs(Date2-Date1)/1000;
+					
+					var velocity = distance/time*3.6;
+
+					var path = new google.maps.Polyline({
+					  path: paths,
+					  geodesic: true,
+					  strokeColor: velocityToColor(velocity),
+					  strokeOpacity: 0.8,
+					  strokeWeight: 1,
+					});
+
+					//Pathen ritas ut
+					path.setMap(map);
+					overlays.push(path);
+					
+				}
+			}
+		}
 		
+		function velocityToColor(velocity){
+			if(velocity < 10)
+				return '#F00';
+			else if(velocity >= 10 && velocity < 50)
+				return '#e59400';
+			else if(velocity >= 50 && velocity < 70)
+				return '#FF0';
+			else
+				return '#0F0';
+		}
 
 		function drawPathTime(hourMin, hourMax){
 			clearOverlays();
@@ -200,6 +260,24 @@
 			}, 30);
 		}
 
+		//Function for drawing trajectorys that has a specified direction
+		/*function drawPathDir(direction)
+		{
+			for(var i = 1; i<carData.length; i++)
+			{
+				for(var j = 0; j <2; j++)
+				{
+					//if(raden under == E) trajectoryEast.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']))
+					console.log(checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']));
+					//Same for outher directions
+				}
+			}
+
+			var paths = [];
+
+
+		}*/
+
 		//Function for drawing brush
 		function drawBrush()
 		{
@@ -244,6 +322,96 @@
 				drawPathTime(ext[0], ext[1]);
 				return ext;
 			})
+
+		}
+
+		console.log(checkDirection(1, 0, 0, 1));
+
+		function checkDirection(lat1, lat2, lon1, lon2)
+		{
+			var Direction;
+
+			var latDiff = lat2 - lat1;
+			var lonDiff = lon2 - lon1;
+			var latDirDiff = latDiff - lonDiff;
+			var lonDirDiff = lonDiff - latDiff;
+			var threshold = 0.001;
+
+			if(latDiff == 0 && lonDiff == 0)
+				return -1;
+			var diagConst = 0.707107;
+			var vecLength = Math.sqrt((latDiff*latDiff) + (lonDiff*lonDiff));
+			latDiff = latDiff/vecLength;
+			lonDiff = lonDiff/vecLength;
+
+			if(latDiff >= 0 && lonDiff >= 0) //First quadrant
+			{
+				if((latDiff*1 + lonDiff*0) > 0.75)
+					Direction = "N";
+				else if((latDiff*diagConst + lonDiff*diagConst) >= 0.75)
+					Direction = "NE";
+				else
+					Direction = "E";
+
+			}
+			else if(latDiff >= 0 && lonDiff < 0) //Second quadrant
+			{
+				if((latDiff*1 + lonDiff*0) > 0.75)
+					Direction = "N";
+				else if((latDiff*diagConst - lonDiff*diagConst) >= 0.75)
+					Direction = "NW";
+				else
+					Direction = "W";
+			}
+			else if(latDiff < 0 && lonDiff < 0) //Third quadrant
+			{
+				if((latDiff*0 - lonDiff*1) > 0.75)
+					Direction = "W";
+				else if((-latDiff*diagConst -lonDiff*diagConst) >= 0.75)
+					Direction = "SW";
+				else
+					Direction = "S";				
+			}
+			else if(latDiff < 0 && lonDiff >= 0) //Fourth quadrant
+			{
+				if((-latDiff*1 + lonDiff*0) > 0.75)
+					Direction = "S";
+				else if((-latDiff*diagConst + lonDiff*diagConst) >= 0.75)
+					Direction = "SE";
+				else
+					Direction = "E";
+			}
+
+
+			/*if(latDirDiff > threshold)
+			{
+				if(latDiff > 0)
+					Direction = "N";
+				else
+					Direction = "S";
+			}
+			
+			else if(lonDirDiff > threshold)
+			{
+				if(lonDiff > 0)
+					Direction = "E";
+				else
+					Direction = "W";
+			}
+
+			else
+			{
+				if(latDiff > 0 && lonDiff > 0)
+					Direction = "NE";
+				else if(latDiff > 0 && lonDiff < 0)
+					Direction = "NW";
+				else if(latDiff < 0 && lonDiff > 0)
+					Direction = "SE";
+				else if(latDiff < 0 && lonDiff < 0)
+					Direction = "SW";
+			}*/
+
+			return Direction;
 
 		}
 		  
