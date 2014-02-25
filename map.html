@@ -15,7 +15,7 @@
 	<button id="clearButton" onclick="animatePaths()">Animate cars</button>
 	<button id="clearButton" onclick="drawPathSpeed()">Show car speed</button>
 	<button id="clearButton" onclick="drawpaths()">Show all paths</button>
-	<button id="clearButton" onclick="drawPathDir()">Direction</button>
+	<button id="clearButton" onclick="drawSlowTraffic()">Slow traffic</button>
 
 	<div id="map-canvas"/>
 	
@@ -309,19 +309,78 @@
 
 		}*/
 
+		function drawSlowTraffic(){
+
+			clearOverlays();
+
+			var slowTrafficArr = [];
+			var direction;
+
+			for (var i=1; i<carData.length; i++)
+			{
+				for(var j=0; j<(carData[i].length-1); j++)
+				{
+					var paths = [];
+
+					var carInfo = [];	
+
+					var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
+
+					var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
+
+					var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
+
+					var time = Math.abs(Date2-Date1)/1000;
+					
+					var velocity = distance/time*3.6;
+
+					if(velocity < 10)
+					{
+						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
+
+						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
+
+						carInfo['lat1'] = carData[i][j]['lat'];
+						carInfo['lat2'] = carData[i][j+1]['lat'];
+						carInfo['lon1'] = carData[i][j]['lon'];
+						carInfo['lon2'] = carData[i][j+1]['lon'];
+						carInfo['vel'] = velocity;
+						carInfo['dir'] = direction;
+
+						slowTrafficArr.push(carInfo);
+					}					
+
+					var path = new google.maps.Polyline({
+					  path: paths,
+					  geodesic: true,
+					  strokeColor: velocityToColor(velocity),
+					  strokeOpacity: 0.8,
+					  strokeWeight: 1,
+					});
+
+
+					//Pathen ritas ut
+					path.setMap(map);
+					overlays.push(path);
+					
+				}
+			}
+		}
+
 		//Function for drawing brush
 		function drawBrush()
 		{
 			//Create scale 
 			var timeScale = d3.scale.linear()
-				.domain([0, 22])  //input domain
+				.domain([0, 24])  //input domain
 				.range([0, 500]); //output range
 
 			//Define axis
 			var timeAxis = d3.svg.axis()
 				.scale(timeScale)
 				.orient("bottom")
-				.ticks(11);
+				.ticks(12);
 
 			//Create SVG element
 			var svg = d3.select("#container")
@@ -365,7 +424,6 @@
 			var lonDiff = lon2 - lon1;
 			var latDirDiff = latDiff - lonDiff;
 			var lonDirDiff = lonDiff - latDiff;
-			var threshold = 0.001;
 
 			if(latDiff == 0 && lonDiff == 0)
 				return -1;
