@@ -25,6 +25,7 @@ body {
 	margin-left: 150px;
 	border-style: solid;
 	border-width: 1px;
+	border-color: #444;
 }
 
 #clearButton {
@@ -67,9 +68,9 @@ ol{
 	padding-right: 5px;
 }
 
-.axis text {
+.axis text, .axis label {
     font-family: sans-serif;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 #progress-bar {

@@ -391,10 +391,13 @@
 		//Function for drawing brush
 		function drawBrush()
 		{
+
+			var width = 750;
+
 			//Create scale 
 			var timeScale = d3.scale.linear()
 				.domain([0, 24])  //input domain
-				.range([0, 750]); //output range
+				.range([0, width]); //output range
 
 			//Define axis
 			var timeAxis = d3.svg.axis()
@@ -405,20 +408,25 @@
 			//Create SVG element
 			var svg = d3.select("#timeline")
 				.append("svg")
-				.attr("width", 760)
-				.attr("height", 30);
+				.attr("width", width+20)
+				.attr("height", 50);
 
 			//Create axis
 			svg.append("g")
 				.attr("class", "axis")
-				.attr("transform", "translate(5,0)")
-				.call(timeAxis);
+				.attr("transform", "translate(5,25)")
+				.call(timeAxis)
+				.append("text")
+				.attr("class", "label")
+				.attr("x", (width/2)-30)
+				.attr("y", -10)
+				.text("Timeline");
 
 			//Create brush
 			var brush = d3.svg.brush();
 			brush.x(timeScale)
 			brush(svg)
-			svg.selectAll("rect").attr("height", 16).attr("transform", "translate(5,0)")
+			svg.selectAll("rect").attr("height", 22).attr("transform", "translate(5,25)")
 			/*svg.selectAll(".background")
 				.style({fill: "#fff", visibility: "visible"})*/
 			svg.selectAll(".extent")
