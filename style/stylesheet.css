@@ -17,7 +17,6 @@ body {
 
 	height: 500px;
 	width: 750px;
-	background-color: #EEE;
 	margin-top: 0px;
 	position: absolute;
 	z-index: 0;
@@ -34,7 +33,6 @@ body {
 	width: 120px;
 	height: 35px;
 	z-index: 100;
-		
 	
 }
 ol{
