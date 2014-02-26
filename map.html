@@ -10,18 +10,16 @@
   <body>
   <div id="container">
 
-  	
-
   	<ol>
-		<li><button id="clearButton" onclick="animatePaths()">Animate cars</button></li>
-		<li><button id="clearButton" onclick="drawPathSpeed()">Show car speed</button></li>
-		<li><button id="clearButton" onclick="drawpaths()">Show all paths</button></li>
-		<li><button id="clearButton" onclick="drawSlowTraffic()">Slow traffic</button></li>
+		<li><button id="clearButton" onclick="animatePaths(hourMin, hourMax)">Animate cars</button></li>
+		<li><button id="clearButton" onclick="drawPathSpeed(hourMin, hourMax)">Show car speed</button></li>
+		<li><button id="clearButton" onclick="drawpaths(hourMin, hourMax)">Show all paths</button></li>
+		<li><button id="clearButton" onclick="drawSlowTraffic(hourMin, hourMax)">Slow traffic</button></li>
 	</ol>
 
 	<div id="timeline"></div>
 
-	<img id="loader" src="img/loader.gif" alt="loading" style="height: 45px; width: 45px;">
+	<div id="loading"><p>Loading map...</p></div>
 
 	<div id="map-canvas">
 	</div>
@@ -41,51 +39,58 @@
 
     <!--D3 API-->
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+	<!--javascript files-->
+	<script src="js/drawFunctions.js"></script>
 	<script src="js/readData.js"></script>
   	
   	<!--Main Javascript-->
 	<script type="text/javascript">
 		google.maps.event.addDomListener(window, 'load', initialize);
 			
-		var overlays = [];
 		var carData = [];		
 		var map;
-		var currentView = "";
-
-		//function to clear all overlays on the map
-		//each time an overlay is created it has to be added to the array overlays
-		function clearOverlays()
-		{
-
-			while(overlays[0])
-			{
-				overlays.pop().setMap(null);
-			}
-		}
 
 		function initialize() {
-			var self = this;
+			var styles = [
+			    {
+			      stylers: [
+			        { hue: "#00FF00" },
+			        { saturation: -20 }
+			      ]
+			    },{
+			      featureType: "road",
+			      elementType: "geometry",
+			      stylers: [
+			        { lightness: 100 },
+			        { visibility: "simplified" }
+			      ]
+			    },{
+			      featureType: "road",
+			      elementType: "labels",
+			      stylers: [
+			        { visibility: "off" }
+			      ]
+			    }
+			];
+
+			var styledMap = new google.maps.StyledMapType(styles,
+    			{name: "Styled Map"});
 			
 			//Initializing map
 			var mapOptions = {
 			  center: new google.maps.LatLng(45.467, 9.187317),
-			  zoom: 11
+			  zoom: 11,
+			  mapTypeControlOptions: {
+			      mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+			    }
 			};
 			map = new google.maps.Map(document.getElementById("map-canvas"),
 				mapOptions);
-				
-		}
 
-		function latlonToMeters(lon1, lat1, lon2, lat2){
-			var R = 6378.137; // Radius of earth in KM
-		    var dLat = (lat2 - lat1) * Math.PI / 180;
-		    var dLon = (lon2 - lon1) * Math.PI / 180;
-		    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-		    	Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-		    	Math.sin(dLon/2) * Math.sin(dLon/2);
-		    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-		    var d = R * c;
-		    return d * 1000; // meters
+			map.mapTypes.set('map_style', styledMap);
+  			map.setMapTypeId('map_style');
+				
 		}
 		
 		//Drawing the time line
@@ -98,319 +103,9 @@
 		dsv("data/Milan_Car_Trajectories.csv", function(data) {
 		
 			carData = readData(data);
-			$("#loader").show();
-    		//document.getElementById('loader').style.visibility = 'visible';
+			
 			drawpaths();
-			//setTimeout(drawpaths(), 5);
-			$("#loader").hide();
 		});
-
-
-		function drawCurrent(min, max){
-			if(currentView == "standard")
-				drawpaths(min, max);
-			else if(currentView == "speed")
-				drawPathSpeed(min, max);
-			else if(currentView == "animate")
-				animatePaths(min, max);
-			else if(currentView == "slowTraffic")
-				drawSlowTraffic(min, max);
-			else
-				alert("no view is currently set.");
-		}
-
-
-		function drawpaths(min, max)
-		{
-			currentView = "standard";
-
-			var hourMin = min||0;
-			var hourMax = max||24;
-
-			if ((max-min)==0){
-				hourMin=0;
-				hourMax=24;
-			}
-
-			clearOverlays();
-
-			$("#loader").show();
-			document.getElementById('loader').style.visibility = 'visible';
-			setTimeout(loop, 5);
-
-			function loop()
-			{
-			var paths = [];
-			
-			for (var i=1; i<carData.length; i++)
-			{
-				var trajectory = [];
-				
-				for(var j=0; j<carData[i].length; j++)
-				{
-					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
-					{
-						trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));
-					}		
-				}
-				paths.push(trajectory);
-
-			}
-			
-			for(var i=0; i<paths.length; i++)
-			{
-				var path = new google.maps.Polyline({
-				  path: paths[i],
-				  geodesic: true,
-				  strokeColor: '#00F',
-				  strokeOpacity: 0.2,
-				  strokeWeight: 1,
-				});
-
-				//Pathen ritas ut
-				path.setMap(map);
-				overlays.push(path);
-			}
-			
-			document.getElementById('loader').style.visibility = 'hidden';
-			}
-
-			//document.getElementById('loader').style.visibility = 'hidden';
-			//$("#loader").hide();
-		}
-
-		function drawPathSpeed(min, max){
-
-			currentView = "speed";
-
-			var hourMin = min||0;
-			var hourMax = max||24;
-			
-			if ((max-min)==0){
-				hourMin=0;
-				hourMax=24;
-			}
-
-			clearOverlays();
-
-			$("#loader").show();
-			document.getElementById('loader').style.visibility = 'visible';
-			setTimeout(loop, 5);
-
-			function loop()
-			{
-			for (var i=1; i<carData.length; i++)
-			{
-				for(var j=0; j<(carData[i].length-1); j++)
-				{
-					var paths = [];
-					
-					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
-					{
-
-						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-
-						var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
-
-						var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
-
-						var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
-
-						var time = Math.abs(Date2-Date1)/1000;
-						
-						var velocity = distance/time*3.6;
-
-						var path = new google.maps.Polyline({
-						  path: paths,
-						  geodesic: true,
-						  strokeColor: velocityToColor(velocity),
-						  strokeOpacity: 0.2,
-						  strokeWeight: 1,
-						});
-
-						//Pathen ritas ut
-						path.setMap(map);
-						overlays.push(path);
-					}
-				}
-			}
-			document.getElementById('loader').style.visibility = 'hidden';
-			}
-			
-		}
-		
-		function velocityToColor(velocity){
-			if(velocity < 7)
-				return '#F00';
-			else if(velocity >= 7 && velocity < 60)
-				return '#e59400';
-			else if(velocity >= 60 && velocity < 90)
-				return '#FF0';
-			else
-				return '#0F0';
-		}
-
-
-		function animatePaths(min, max){
-
-			currentView = "animate";
-
-			var hourMin = min||0;
-			var hourMax = max||24;
-			
-			if ((max-min)==0){
-				hourMin=0;
-				hourMax=24;
-			}
-
-			clearOverlays();
-
-			var lineSymbol = {
-				path: google.maps.SymbolPath.CIRCLE,
-				scale: 2,
-				strokeColor: '#000',
-				strokeOpacity: 1
-			};
-
-			var paths = [];
-			
-			for (var i=1; i<100; i++)
-			{
-				var trajectory = [];
-				
-				for(var j=0; j<carData[i].length; j++)
-				{
-					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
-					{
-						trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));
-					}	
-				}
-				paths.push(trajectory);
-			}
-			
-			for(var i=0; i<paths.length; i++)
-			{
-				var path = new google.maps.Polyline({
-				  path: paths[i],
-				  icons: [{icon: lineSymbol, offset: '100%'}],
-				  geodesic: true,
-				  strokeColor: '#00F',
-				  strokeOpacity: 0,
-				  strokeWeight: 1,
-				  map: map,
-				});
-
-				//Pathen ritas ut
-				overlays.push(path);
-				animateCircle(path);
-			}	
-		}
-
-		function animateCircle(path) {
-			var count = 0;
-			window.setInterval(function() {
-			  count = (count + 1) % 200;
-
-			  var icons = path.get('icons');
-			  icons[0].offset = (count / 3) + '%';
-			  path.set('icons', icons);
-			}, 30);
-		}
-
-
-		function drawSlowTraffic(min, max){
-
-			currentView = "slowTraffic";
-
-			clearOverlays();
-
-			var slowTrafficArr = [];
-			var direction;
-
-			var hourMin = min||0;
-			var hourMax = max||24;
-			
-			if ((max-min)==0){
-				hourMin=0;
-				hourMax=24;
-			}
-
-			for (var i=1; i<carData.length; i++)
-			{
-				for(var j=0; j<(carData[i].length-1); j++)
-				{
-					var paths = [];
-
-					var carInfo = [];	
-
-					var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
-
-					var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
-
-					var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
-
-					var time = Math.abs(Date2-Date1)/1000;
-					
-					var velocity = distance/time*3.6;
-
-					if(velocity < 5)
-					{
-						if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
-						{
-
-							paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-							paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-
-							direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
-
-							carInfo['lat1'] = carData[i][j]['lat'];
-							carInfo['lat2'] = carData[i][j+1]['lat'];
-							carInfo['lon1'] = carData[i][j]['lon'];
-							carInfo['lon2'] = carData[i][j+1]['lon'];
-							carInfo['vel'] = velocity;
-							carInfo['dir'] = direction;
-
-							slowTrafficArr.push(carInfo);
-						}
-					}					
-
-					var path = new google.maps.Polyline({
-					  path: paths,
-					  geodesic: true,
-					  strokeColor: directionToColor(direction),
-					  strokeOpacity: 0.8,
-					  strokeWeight: 3,
-					});
-
-
-					//Pathen ritas ut
-					path.setMap(map);
-					overlays.push(path);
-					
-				}
-			}
-		}
-		function directionToColor(direction)
-		{
-			if(direction == "N")
-				return '#e41a1c';
-			else if(direction == "S")
-				return '#377eb8';
-			else if(direction == "E")
-				return '#4daf4a';
-			else if(direction == "W")
-				return '#984ea3';
-			else if(direction == "NE")
-				return '#ff7f00';
-			else if(direction == "NW")
-				return '#ffff33';
-			else if(direction == "SE")
-				return '#a65628';
-			else if(direction == "SW")
-				return '#f781bf';
-
-		}
 
 		//Function for drawing brush
 		function drawBrush()
@@ -462,73 +157,12 @@
 			brush.on("brushend", function(){
 				ext = brush.extent();
 				drawCurrent(ext[0], ext[1]);
+				hourMin = ext[0];
+				hourMax = ext[1];
 				return ext;
 			})
-
 		}
-
-
-		function checkDirection(lat1, lat2, lon1, lon2)
-		{
-			var Direction;
-
-			var latDiff = lat2 - lat1;
-			var lonDiff = lon2 - lon1;
-			var latDirDiff = latDiff - lonDiff;
-			var lonDirDiff = lonDiff - latDiff;
-
-			if(latDiff == 0 && lonDiff == 0)
-				return -1;
-
-			var diagConst = 0.707107;
-			var vecLength = Math.sqrt((latDiff*latDiff) + (lonDiff*lonDiff));
-			latDiff = latDiff/vecLength;
-			lonDiff = lonDiff/vecLength;
-
-			if(latDiff >= 0 && lonDiff >= 0) //First quadrant
-			{
-				if((latDiff*1 + lonDiff*0) > 0.75)
-					Direction = "N";
-				else if((latDiff*diagConst + lonDiff*diagConst) >= 0.75)
-					Direction = "NE";
-				else
-					Direction = "E";
-
-			}
-			else if(latDiff >= 0 && lonDiff < 0) //Second quadrant
-			{
-				if((latDiff*1 + lonDiff*0) > 0.75)
-					Direction = "N";
-				else if((latDiff*diagConst - lonDiff*diagConst) >= 0.75)
-					Direction = "NW";
-				else
-					Direction = "W";
-			}
-			else if(latDiff < 0 && lonDiff < 0) //Third quadrant
-			{
-				if((latDiff*0 - lonDiff*1) > 0.75)
-					Direction = "W";
-				else if((-latDiff*diagConst -lonDiff*diagConst) >= 0.75)
-					Direction = "SW";
-				else
-					Direction = "S";				
-			}
-			else if(latDiff < 0 && lonDiff >= 0) //Fourth quadrant
-			{
-				if((-latDiff*1 + lonDiff*0) > 0.75)
-					Direction = "S";
-				else if((-latDiff*diagConst + lonDiff*diagConst) >= 0.75)
-					Direction = "SE";
-				else
-					Direction = "E";
-			}
-
-			return Direction;
-
-		}
-		  
-		
-		
+	
     </script>
   
 </html>
