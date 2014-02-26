@@ -37,6 +37,26 @@ function velocityToColor(velocity){
 		return '#0F0';
 }
 
+function directionToColor(direction)
+{
+	if(direction == "N")
+		return '#e41a1c';
+	else if(direction == "S")
+		return '#377eb8';
+	else if(direction == "E")
+		return '#4daf4a';
+	else if(direction == "W")
+		return '#984ea3';
+	else if(direction == "NE")
+		return '#ff7f00';
+	else if(direction == "NW")
+		return '#ffff33';
+	else if(direction == "SE")
+		return '#a65628';
+	else if(direction == "SW")
+		return '#f781bf';
+
+}
 
 function checkDirection(lat1, lat2, lon1, lon2){
 	var Direction;
@@ -367,7 +387,7 @@ function drawSlowTraffic(min, max){
 				var path = new google.maps.Polyline({
 				  path: paths,
 				  geodesic: true,
-				  strokeColor: velocityToColor(velocity),
+				  strokeColor: directionToColor(direction),
 				  strokeOpacity: 0.2,
 				  strokeWeight: 2,
 				});
