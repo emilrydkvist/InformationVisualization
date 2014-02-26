@@ -318,23 +318,6 @@
 			}, 30);
 		}
 
-		//Function for drawing trajectorys that has a specified direction
-		/*function drawPathDir(direction)
-		{
-			for(var i = 1; i<carData.length; i++)
-			{
-				for(var j = 0; j <2; j++)
-				{
-					//if(raden under == E) trajectoryEast.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']))
-					console.log(checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']));
-					//Same for outher directions
-				}
-			}
-
-			var paths = [];
-
-
-		}*/
 
 		function drawSlowTraffic(min, max){
 
@@ -371,7 +354,7 @@
 					
 					var velocity = distance/time*3.6;
 
-					if(velocity < 7)
+					if(velocity < 5)
 					{
 						if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
 						{
@@ -395,9 +378,9 @@
 					var path = new google.maps.Polyline({
 					  path: paths,
 					  geodesic: true,
-					  strokeColor: velocityToColor(velocity),
-					  strokeOpacity: 0.2,
-					  strokeWeight: 1,
+					  strokeColor: directionToColor(direction),
+					  strokeOpacity: 0.8,
+					  strokeWeight: 3,
 					});
 
 
@@ -407,6 +390,26 @@
 					
 				}
 			}
+		}
+		function directionToColor(direction)
+		{
+			if(direction == "N")
+				return '#e41a1c';
+			else if(direction == "S")
+				return '#377eb8';
+			else if(direction == "E")
+				return '#4daf4a';
+			else if(direction == "W")
+				return '#984ea3';
+			else if(direction == "NE")
+				return '#ff7f00';
+			else if(direction == "NW")
+				return '#ffff33';
+			else if(direction == "SE")
+				return '#a65628';
+			else if(direction == "SW")
+				return '#f781bf';
+
 		}
 
 		//Function for drawing brush
