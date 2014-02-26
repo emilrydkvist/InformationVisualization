@@ -33,8 +33,10 @@ body {
 	width: 120px;
 	height: 35px;
 	z-index: 100;
-	
+
 }
+
+
 ol{
 	position: relative;
 	top: 20px;
@@ -77,8 +79,8 @@ ol{
 	position: relative;
 	height:10px;
 	top: 450px;
-	margin-left: auto ;
-  	margin-right: auto ;
+	margin-left: auto;
+  	margin-right: auto;
 }
 
 #bar {
@@ -86,4 +88,12 @@ ol{
 	height:10px; 
 	width:50%; 
 	background-color: #075;
+}
+
+#loader {
+	z-index: 100;
+	position: absolute;
+	margin: auto;
+	top: 170px;
+	left: 460px;
 }
