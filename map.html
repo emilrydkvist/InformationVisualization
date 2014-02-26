@@ -12,10 +12,14 @@
 
   	
 
-	<button id="clearButton" onclick="animatePaths()">Animate cars</button>
-	<button id="clearButton" onclick="drawPathSpeed()">Show car speed</button>
-	<button id="clearButton" onclick="drawpaths()">Show all paths</button>
-	<button id="clearButton" onclick="drawSlowTraffic()">Slow traffic</button>
+  	<ol>
+		<li><button id="clearButton" onclick="animatePaths()">Animate cars</button></li>
+		<li><button id="clearButton" onclick="drawPathSpeed()">Show car speed</button></li>
+		<li><button id="clearButton" onclick="drawpaths()">Show all paths</button></li>
+		<li><button id="clearButton" onclick="drawSlowTraffic()">Slow traffic</button></li>
+	</ol>
+
+	<div id="timeline"></div>
 
 	<img id="loader" src="img/loader.gif" alt="loading" style="height: 45px; width: 45px;">
 
@@ -109,6 +113,8 @@
 				drawPathSpeed(min, max);
 			else if(currentView == "animate")
 				animatePaths(min, max);
+			else if(currentView == "slowTraffic")
+				drawSlowTraffic(min, max);
 			else
 				alert("no view is currently set.");
 		}
@@ -330,12 +336,22 @@
 
 		}*/
 
-		function drawSlowTraffic(){
+		function drawSlowTraffic(min, max){
+
+			currentView = "slowTraffic";
 
 			clearOverlays();
 
 			var slowTrafficArr = [];
 			var direction;
+
+			var hourMin = min||0;
+			var hourMax = max||24;
+			
+			if ((max-min)==0){
+				hourMin=0;
+				hourMax=24;
+			}
 
 			for (var i=1; i<carData.length; i++)
 			{
@@ -355,28 +371,32 @@
 					
 					var velocity = distance/time*3.6;
 
-					if(velocity < 10)
+					if(velocity < 7)
 					{
-						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
+						if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
+						{
 
-						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
+							paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+							paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
 
-						carInfo['lat1'] = carData[i][j]['lat'];
-						carInfo['lat2'] = carData[i][j+1]['lat'];
-						carInfo['lon1'] = carData[i][j]['lon'];
-						carInfo['lon2'] = carData[i][j+1]['lon'];
-						carInfo['vel'] = velocity;
-						carInfo['dir'] = direction;
+							direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
 
-						slowTrafficArr.push(carInfo);
+							carInfo['lat1'] = carData[i][j]['lat'];
+							carInfo['lat2'] = carData[i][j+1]['lat'];
+							carInfo['lon1'] = carData[i][j]['lon'];
+							carInfo['lon2'] = carData[i][j+1]['lon'];
+							carInfo['vel'] = velocity;
+							carInfo['dir'] = direction;
+
+							slowTrafficArr.push(carInfo);
+						}
 					}					
 
 					var path = new google.maps.Polyline({
 					  path: paths,
 					  geodesic: true,
 					  strokeColor: velocityToColor(velocity),
-					  strokeOpacity: 0.8,
+					  strokeOpacity: 0.2,
 					  strokeWeight: 1,
 					});
 
@@ -392,10 +412,13 @@
 		//Function for drawing brush
 		function drawBrush()
 		{
+
+			var width = 750;
+
 			//Create scale 
 			var timeScale = d3.scale.linear()
 				.domain([0, 24])  //input domain
-				.range([0, 500]); //output range
+				.range([0, width]); //output range
 
 			//Define axis
 			var timeAxis = d3.svg.axis()
@@ -404,22 +427,27 @@
 				.ticks(12);
 
 			//Create SVG element
-			var svg = d3.select("#container")
+			var svg = d3.select("#timeline")
 				.append("svg")
-				.attr("width", 525)
-				.attr("height", 30);
+				.attr("width", width+20)
+				.attr("height", 50);
 
 			//Create axis
 			svg.append("g")
 				.attr("class", "axis")
-				.attr("transform", "translate(5,0)")
-				.call(timeAxis);
+				.attr("transform", "translate(5,25)")
+				.call(timeAxis)
+				.append("text")
+				.attr("class", "label")
+				.attr("x", (width/2)-30)
+				.attr("y", -10)
+				.text("Timeline");
 
 			//Create brush
 			var brush = d3.svg.brush();
 			brush.x(timeScale)
 			brush(svg)
-			svg.selectAll("rect").attr("height", 16).attr("transform", "translate(5,0)")
+			svg.selectAll("rect").attr("height", 22).attr("transform", "translate(5,25)")
 			/*svg.selectAll(".background")
 				.style({fill: "#fff", visibility: "visible"})*/
 			svg.selectAll(".extent")
@@ -448,6 +476,7 @@
 
 			if(latDiff == 0 && lonDiff == 0)
 				return -1;
+
 			var diagConst = 0.707107;
 			var vecLength = Math.sqrt((latDiff*latDiff) + (lonDiff*lonDiff));
 			latDiff = latDiff/vecLength;
