@@ -10,14 +10,17 @@
   <body>
   <div id="container">
 
-  	<div id="progressbar"></div>
+  	
 
 	<button id="clearButton" onclick="animatePaths()">Animate cars</button>
 	<button id="clearButton" onclick="drawPathSpeed()">Show car speed</button>
 	<button id="clearButton" onclick="drawpaths()">Show all paths</button>
 	<button id="clearButton" onclick="drawSlowTraffic()">Slow traffic</button>
 
-	<div id="map-canvas"/>
+	<img id="loader" src="img/loader.gif" alt="loading" style="height: 45px; width: 45px;">
+
+	<div id="map-canvas">
+	</div>
 	
 	
   </div>
@@ -56,7 +59,6 @@
 			}
 		}
 
-
 		function initialize() {
 			var self = this;
 			
@@ -92,8 +94,11 @@
 		dsv("data/Milan_Car_Trajectories.csv", function(data) {
 		
 			carData = readData(data);
-
+			$("#loader").show();
+    		//document.getElementById('loader').style.visibility = 'visible';
 			drawpaths();
+			//setTimeout(drawpaths(), 5);
+			$("#loader").hide();
 		});
 
 
@@ -123,9 +128,13 @@
 
 			clearOverlays();
 
-			var paths = [];
+			$("#loader").show();
+			document.getElementById('loader').style.visibility = 'visible';
+			setTimeout(loop, 5);
 
-			var progress = 0;
+			function loop()
+			{
+			var paths = [];
 			
 			for (var i=1; i<carData.length; i++)
 			{
@@ -139,8 +148,6 @@
 					}		
 				}
 				paths.push(trajectory);
-
-				//progress = (i/(carData.length))*100;
 
 			}
 			
@@ -158,7 +165,12 @@
 				path.setMap(map);
 				overlays.push(path);
 			}
-				
+			
+			document.getElementById('loader').style.visibility = 'hidden';
+			}
+
+			//document.getElementById('loader').style.visibility = 'hidden';
+			//$("#loader").hide();
 		}
 
 		function drawPathSpeed(min, max){
@@ -175,6 +187,12 @@
 
 			clearOverlays();
 
+			$("#loader").show();
+			document.getElementById('loader').style.visibility = 'visible';
+			setTimeout(loop, 5);
+
+			function loop()
+			{
 			for (var i=1; i<carData.length; i++)
 			{
 				for(var j=0; j<(carData[i].length-1); j++)
@@ -211,6 +229,9 @@
 					}
 				}
 			}
+			document.getElementById('loader').style.visibility = 'hidden';
+			}
+			
 		}
 		
 		function velocityToColor(velocity){
