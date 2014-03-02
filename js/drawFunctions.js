@@ -14,6 +14,7 @@ function clearOverlays(){
 	}
 }
 
+
 //function to clear information in the infobox before you print out new info
 function clearBox(elementID)
 {
@@ -276,9 +277,8 @@ function drawPathSpeed(min, max){
 		//Add the svg to the div
 		receptacle.innerHTML='' + svgfragment + list + title;
 
-		}
-		
-		
+	}
+				
 }
 
 
