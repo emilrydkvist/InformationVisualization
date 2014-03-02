@@ -9,66 +9,91 @@
   </head>
   <body>
   <div id="container">
-	<button id="clearButton" onclick="animatePaths()">Animate cars</button>
-	<button id="clearButton" onclick="drawPathSpeed()">Show car speed</button>
-	<button id="clearButton" onclick="drawpaths()">Show all paths</button>
-	<button id="clearButton" onclick="drawPathDir()">Direction</button>
 
-	<div id="map-canvas"/>
+  	<ol>
+		<li><button id="clearButton" onclick="animatePaths(hourMin, hourMax)">Animate cars</button></li>
+		<li><button id="clearButton" onclick="drawPathSpeed(hourMin, hourMax)">Show car speed</button></li>
+		<li><button id="clearButton" onclick="drawpaths(hourMin, hourMax)">Show all paths</button></li>
+		<li><button id="clearButton" onclick="drawSlowTraffic(hourMin, hourMax)">Slow traffic</button></li>
+	</ol>
+
+	<div id="timeline"></div>
+
+	<div id="loading"><p>Loading map...</p></div>
+	<div id="infobox">
+		<svg id="svgcanvas"></svg>
+	</div>
+
+	<div id="map-canvas">
+	</div>
 	
 	
   </div>
   </body>
-  	
+  	<!--JQUERY import-->
+  	<script type="text/javascript"
+      src="//code.jquery.com/jquery-1.10.2.js">
+    </script>
+
+    <!--Google Maps API-->
   	<script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3Y_z1NJv4bw5RpU0dglIegtfwRJRNaOY&sensor=true">
     </script>
 
+    <!--D3 API-->
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+	<!--javascript files-->
+	<script src="js/drawFunctions.js"></script>
 	<script src="js/readData.js"></script>
-  
+  	
+  	<!--Main Javascript-->
 	<script type="text/javascript">
 		google.maps.event.addDomListener(window, 'load', initialize);
 			
-		var overlays = [];
 		var carData = [];		
 		var map;
 
-		//function to clear all overlays on the map
-		//each time an overlay is created it has to be added to the array overlays
-		function clearOverlays()
-		{
-
-			while(overlays[0])
-			{
-				overlays.pop().setMap(null);
-			}
-		}
-
-
 		function initialize() {
-			var self = this;
+			var styles = [
+			    {
+			      stylers: [
+			        { hue: "#00FF00" },
+			        { saturation: -20 }
+			      ]
+			    },{
+			      featureType: "road",
+			      elementType: "geometry",
+			      stylers: [
+			        { lightness: 100 },
+			        { visibility: "simplified" }
+			      ]
+			    },{
+			      featureType: "road",
+			      elementType: "labels",
+			      stylers: [
+			        { visibility: "off" }
+			      ]
+			    }
+			];
+
+			var styledMap = new google.maps.StyledMapType(styles,
+    			{name: "Styled Map"});
 			
 			//Initializing map
 			var mapOptions = {
-			  center: new google.maps.LatLng(45.450497, 9.187317),
-			  zoom: 11
+			  center: new google.maps.LatLng(45.467, 9.187317),
+			  zoom: 11,
+			  mapTypeControlOptions: {
+			      mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+			    }
 			};
 			map = new google.maps.Map(document.getElementById("map-canvas"),
 				mapOptions);
-				
-		}
 
-		function latlonToMeters(lon1, lat1, lon2, lat2){
-			var R = 6378.137; // Radius of earth in KM
-		    var dLat = (lat2 - lat1) * Math.PI / 180;
-		    var dLon = (lon2 - lon1) * Math.PI / 180;
-		    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-		    	Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-		    	Math.sin(dLon/2) * Math.sin(dLon/2);
-		    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-		    var d = R * c;
-		    return d * 1000; // meters
+			map.mapTypes.set('map_style', styledMap);
+  			map.setMapTypeId('map_style');
+				
 		}
 		
 		//Drawing the time line
@@ -81,234 +106,49 @@
 		dsv("data/Milan_Car_Trajectories.csv", function(data) {
 		
 			carData = readData(data);
-
+			
 			drawpaths();
 		});
-
-		function drawpaths()
-		{
-			clearOverlays();
-
-			var paths = [];
-			
-			for (var i=1; i<carData.length; i++)
-			{
-				var trajectory = [];
-				
-				for(var j=0; j<carData[i].length; j++)
-				{
-					trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-				}
-				paths.push(trajectory);
-			}
-			
-			for(var i=0; i<paths.length; i++)
-			{
-				var path = new google.maps.Polyline({
-				  path: paths[i],
-				  geodesic: true,
-				  strokeColor: '#00F',
-				  strokeOpacity: 0.2,
-				  strokeWeight: 1,
-				});
-
-				//Pathen ritas ut
-				path.setMap(map);
-				overlays.push(path);
-			}
-				
-		}
-
-		function drawPathSpeed(){
-
-			clearOverlays();
-
-			for (var i=1; i<carData.length; i++)
-			{
-				for(var j=0; j<(carData[i].length-1); j++)
-				{
-					var paths = [];
-					
-
-					paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-					paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-
-					var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
-
-					var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
-
-					var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
-
-					var time = Math.abs(Date2-Date1)/1000;
-					
-					var velocity = distance/time*3.6;
-
-					var path = new google.maps.Polyline({
-					  path: paths,
-					  geodesic: true,
-					  strokeColor: velocityToColor(velocity),
-					  strokeOpacity: 0.2,
-					  strokeWeight: 1,
-					});
-
-					//Pathen ritas ut
-					path.setMap(map);
-					overlays.push(path);
-					
-				}
-			}
-		}
-		
-		function velocityToColor(velocity){
-			if(velocity < 10)
-				return '#F00';
-			else if(velocity >= 10 && velocity < 50)
-				return '#e59400';
-			else if(velocity >= 50 && velocity < 70)
-				return '#FF0';
-			else
-				return '#0F0';
-		}
-
-		function drawPathTime(hourMin, hourMax){
-			clearOverlays();
-
-			var paths = [];
-			
-			for (var i=1; i<carData.length; i++)
-			{
-				var trajectory = [];
-				
-				for(var j=0; j<carData[i].length; j++)
-				{
-
-					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
-					{
-						trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));
-					}	
-				}
-				paths.push(trajectory);
-			}
-			
-			for(var i=0; i<paths.length; i++)
-			{
-				var path = new google.maps.Polyline({
-				  path: paths[i],
-				  geodesic: true,
-				  strokeColor: '#00F',
-				  strokeOpacity: 0.2,
-				  strokeWeight: 1,
-				});
-
-				//Pathen ritas ut
-				path.setMap(map);
-				overlays.push(path);
-			}
-		}
-
-
-		function animatePaths(){
-
-			clearOverlays();
-
-			var lineSymbol = {
-				path: google.maps.SymbolPath.CIRCLE,
-				scale: 2,
-				strokeColor: '#000',
-				strokeOpacity: 1
-			};
-
-			var paths = [];
-			
-			for (var i=1; i<100; i++)
-			{
-				var trajectory = [];
-				
-				for(var j=0; j<carData[i].length; j++)
-				{
-					trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-				}
-				paths.push(trajectory);
-			}
-			
-			for(var i=0; i<paths.length; i++)
-			{
-				var path = new google.maps.Polyline({
-				  path: paths[i],
-				  icons: [{icon: lineSymbol, offset: '100%'}],
-				  geodesic: true,
-				  strokeColor: '#00F',
-				  strokeOpacity: 0,
-				  strokeWeight: 1,
-				  map: map,
-				});
-
-				//Pathen ritas ut
-				overlays.push(path);
-				animateCircle(path);
-			}	
-		}
-
-		function animateCircle(path) {
-			var count = 0;
-			window.setInterval(function() {
-			  count = (count + 1) % 200;
-
-			  var icons = path.get('icons');
-			  icons[0].offset = (count / 3) + '%';
-			  path.set('icons', icons);
-			}, 30);
-		}
-
-		//Function for drawing trajectorys that has a specified direction
-		function drawPathDir(direction)
-		{
-			for(var i = 1; i<carData.length; i++)
-			{
-				for(var j = 0; j <(carData[i].length - 1); j++)
-				{
-					//if(raden under == E) trajectoryEast.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']))
-					console.log(checkDirection(carData[i][j]['lat'], carData[i+1][j]['lat'], carData[i][j]['lon'], carData[i+1][j]['lon']));
-					//Same for outher directions
-				}
-			}
-
-			var paths = [];
-
-
-		}
 
 		//Function for drawing brush
 		function drawBrush()
 		{
+
+			var width = 750;
+
 			//Create scale 
 			var timeScale = d3.scale.linear()
-				.domain([0, 22])  //input domain
-				.range([0, 500]); //output range
+				.domain([0, 24])  //input domain
+				.range([0, width]); //output range
 
 			//Define axis
 			var timeAxis = d3.svg.axis()
 				.scale(timeScale)
 				.orient("bottom")
-				.ticks(11);
+				.ticks(12);
 
 			//Create SVG element
-			var svg = d3.select("#container")
+			var svg = d3.select("#timeline")
 				.append("svg")
-				.attr("width", 525)
-				.attr("height", 30);
+				.attr("width", width+20)
+				.attr("height", 50);
 
 			//Create axis
 			svg.append("g")
 				.attr("class", "axis")
-				.attr("transform", "translate(5,0)")
-				.call(timeAxis);
+				.attr("transform", "translate(5,25)")
+				.call(timeAxis)
+				.append("text")
+				.attr("class", "label")
+				.attr("x", (width/2)-30)
+				.attr("y", -10)
+				.text("Timeline");
 
 			//Create brush
 			var brush = d3.svg.brush();
 			brush.x(timeScale)
 			brush(svg)
-			svg.selectAll("rect").attr("height", 16).attr("transform", "translate(5,0)")
+			svg.selectAll("rect").attr("height", 22).attr("transform", "translate(5,25)")
 			/*svg.selectAll(".background")
 				.style({fill: "#fff", visibility: "visible"})*/
 			svg.selectAll(".extent")
@@ -319,56 +159,13 @@
 			var ext;
 			brush.on("brushend", function(){
 				ext = brush.extent();
-				drawPathTime(ext[0], ext[1]);
+				drawCurrent(ext[0], ext[1]);
+				hourMin = ext[0];
+				hourMax = ext[1];
 				return ext;
 			})
-
 		}
-
-		function checkDirection(lat1, lat2, lon1, lon2)
-		{
-			var Direction;
-
-			var latDiff = lat2 - lat1;
-			var lonDiff = lon2 - lon2;
-			var latDirDiff = latDiff - lonDiff;
-			var lonDirDiff = lonDiff - latDiff;
-			var threshold = 0.001;
-
-			if(latDirDiff > threshold)
-			{
-				if(latDirDiff > 0)
-					Direction = "N";
-				else
-					Direction = "S";
-			}
-			
-			else if(lonDirDiff > threshold)
-			{
-				if(lonDirDiff > 0)
-					Direction = "E";
-				else
-					Direction = "W";
-			}
-
-			else
-			{
-				if(latDiff > 0 && lonDiff > 0)
-					Direction = "NE";
-				else if(latDiff > 0 && lonDiff < 0)
-					Direction = "NW";
-				else if(latDiff < 0 && lonDiff > 0)
-					Direction = "SE";
-				else if(latDiff < 0 && lonDiff < 0)
-					Direction = "SW";
-			}
-
-			return Direction;
-
-		}
-		  
-		
-		
+	
     </script>
   
 </html>
