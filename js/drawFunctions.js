@@ -205,7 +205,7 @@ function drawPathSpeed(min, max){
 	{
 		clearOverlays();
 
-		for (var i=1; i<carData.length; i++)
+		for (var i=1; i<100; i++)
 		{
 			for(var j=0; j<(carData[i].length-1); j++)
 			{
@@ -242,7 +242,30 @@ function drawPathSpeed(min, max){
 			}
 		}
 		document.getElementById('loading').style.visibility = 'hidden';
-	}	
+
+		//Update infobox
+
+		//Create the squares
+
+		//TODO NEXT: SKAPA TABELL ELLER DIV FÖR TEXTEN
+		var squares = '<rect x="20" y="100" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#F00"></rect>'+ '<p x="50" y="100"> < 7 km/h </p>' +
+		'<rect x="20" y="140" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#e59400"></rect>'+ '<p x="50" y="140"> 7-60 km/h </p>' +
+		'<rect x="20" y="180" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#FF0"></rect>'+ '<p x="50" y="180"> 60-90 km/h </p>' +
+		'<rect x="20" y="220" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#0F0"></rect>'+ '<p x="50" y="220"> > 90 km/h </p>';
+		//<rect x="20" y="180" rx="10" ry="10" width="30" height="30" fill="#FF0"/>
+
+		//Create the receptacle for the squares
+		var receptacle = document.getElementById('infobox');
+
+		//Wrap the svg string to a svg object
+		var svgfragment = '<svg>' + squares + '</svg>';
+
+		//Add the svg to the div
+		receptacle.innerHTML='' + svgfragment;
+
+		}
+		
+		
 }
 
 
@@ -388,7 +411,7 @@ function drawSlowTraffic(min, max){
 				  path: paths,
 				  geodesic: true,
 				  strokeColor: directionToColor(direction),
-				  strokeOpacity: 0.2,
+				  strokeOpacity: 0.8,
 				  strokeWeight: 2,
 				});
 
