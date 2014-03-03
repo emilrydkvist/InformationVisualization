@@ -163,7 +163,7 @@ function drawpaths(min, max)
 		{
 			var trajectory = [];
 			
-			for(var j=0; j<carData[i].length; j++)
+			for(var j=0; j<2; j++)
 			{
 				if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
 				{
@@ -339,7 +339,7 @@ function animatePaths(min, max){
 			  map: map,
 			});
 
-			//Pathen ritas ut
+			//Path is painted
 			overlays.push(path);
 			animateCircle(path);
 		}	
@@ -358,6 +358,104 @@ function animateCircle(path) {
 	}, 30);
 }
 
+
+
+function drawSlowdots(min, max){
+
+	currentView = "slowTraffic"; 
+
+	clearBox('infobox');
+
+	var slowTrafficArr = [];
+	var direction;
+
+	var hourMin = min||0;
+	var hourMax = max||24;
+	
+	if ((max-min)==0){
+		hourMin=0;
+		hourMax=24;
+	}
+
+	$("#loading").show();
+	document.getElementById('loading').style.visibility = 'visible';
+	setTimeout(loop, 5);
+
+	function loop()
+	{
+		clearOverlays();
+
+		for (var i=1; i<500; i++)
+		{
+			for(var j=0; j<(carData[i].length-1); j++)
+			{
+				var paths = [];
+
+				var carInfo = [];	
+
+				var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
+
+				var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
+
+				var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
+
+				var time = Math.abs(Date2-Date1)/1000;
+				
+				var velocity = distance/time*3.6;
+
+				if(velocity < 10)
+				{
+					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
+					{
+
+						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
+
+						var center1 = new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']);	
+						var center2 = new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']);	
+
+						carInfo['lat1'] = carData[i][j]['lat'];
+						carInfo['lat2'] = carData[i][j+1]['lat'];
+						carInfo['lon1'] = carData[i][j]['lon'];
+						carInfo['lon2'] = carData[i][j+1]['lon'];
+						carInfo['vel'] = velocity;
+						carInfo['dir'] = direction;
+
+						slowTrafficArr.push(carInfo);
+
+						var dot1 = new google.maps.Circle({
+						  center: center1,
+						  radius: 10,
+						  strokeColor: directionToColor(direction),
+						  strokeOpacity: 0.8,
+						  fillColor: '#F00',
+						  fillOpacity: 0.35,
+						  strokeWeight: 2,
+						});
+
+						var dot2 = new google.maps.Circle({
+						  center: center2,
+						  radius: 10,
+						  strokeColor: directionToColor(direction),
+						  strokeOpacity: 0.8,
+						  fillColor: '#F00',
+						  fillOpacity: 0.35,
+						  strokeWeight: 2,
+						});
+
+						//The path is drawn
+						dot1.setMap(map);
+						dot2.setMap(map);
+						overlays.push(dot1);
+						overlays.push(dot2);
+					}
+				}					
+
+				
+			}
+		}
+		document.getElementById('loading').style.visibility = 'hidden';
+	}
+}
 
 
 function drawSlowTraffic(min, max){
@@ -403,15 +501,15 @@ function drawSlowTraffic(min, max){
 				
 				var velocity = distance/time*3.6;
 
-				if(velocity < 7)
+				if(velocity < 10)
 				{
 					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
 					{
 
+						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
+
 						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
 						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-
-						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
 
 						carInfo['lat1'] = carData[i][j]['lat'];
 						carInfo['lat2'] = carData[i][j+1]['lat'];
@@ -421,22 +519,89 @@ function drawSlowTraffic(min, max){
 						carInfo['dir'] = direction;
 
 						slowTrafficArr.push(carInfo);
+
+						var path = new google.maps.Polyline({
+						  path: paths,
+						  geodesic: true,
+						  strokeColor: directionToColor(direction),
+						  strokeOpacity: 0.8,
+						  strokeWeight: 2,
+						});
+
+						//The path is drawn
+						path.setMap(map);
+						overlays.push(path);
+
 					}
 				}					
-
-				var path = new google.maps.Polyline({
-				  path: paths,
-				  geodesic: true,
-				  strokeColor: directionToColor(direction),
-				  strokeOpacity: 0.2,
-				  strokeWeight: 2,
-				});
-
-				//The path is drawn
-				path.setMap(map);
-				overlays.push(path);
 			}
 		}
 		document.getElementById('loading').style.visibility = 'hidden';
 	}
 }
+
+
+function drawCluster(min, max){
+
+	currentView = "slowTraffic"; 
+
+	clearBox('infobox');
+
+	var slowTrafficArr = [];
+	var direction;
+
+	var hourMin = min||0;
+	var hourMax = max||24;
+	
+	if ((max-min)==0){
+		hourMin=0;
+		hourMax=24;
+	}
+
+	$("#loading").show();
+	document.getElementById('loading').style.visibility = 'visible';
+	setTimeout(loop, 5);
+
+	function loop()
+	{
+		clearOverlays();
+
+		for (var i=1; i<carData.length; i++)
+		{
+			for(var j=0; j<(carData[i].length-1); j++)
+			{
+				var paths = [];
+				var carInfo = [];	
+
+				var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
+
+				var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
+				var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
+				var time = Math.abs(Date2-Date1)/1000;
+			
+				var velocity = distance/time*3.6;
+
+				if(velocity < 10)
+				{
+					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
+					{
+
+						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
+
+						var carInfo = [];
+						carInfo['lat'] = carData[i][j]['lat'];
+						carInfo['lon'] = carData[i][j]['lon'];
+						carInfo['visited'] = false;
+
+						slowTrafficArr.push(carInfo);
+
+					}
+				}					
+			}
+		}
+
+		console.log(clusterDBS(slowTrafficArr, 0.03, 4));
+		document.getElementById('loading').style.visibility = 'hidden';
+	}
+}
+
