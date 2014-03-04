@@ -21,7 +21,8 @@ function clearBox(elementID)
     document.getElementById(elementID).innerHTML = "";
 }
 
-function latlonToMeters(lon1, lat1, lon2, lat2){
+function latlonToMeters(lon1, lat1, lon2, lat2)
+{
 	var R = 6378.137; // Radius of earth in KM
     var dLat = (lat2 - lat1) * Math.PI / 180;
     var dLon = (lon2 - lon1) * Math.PI / 180;
@@ -42,6 +43,14 @@ function velocityToColor(velocity){
 		return '#FF0';
 	else
 		return '#0F0';
+}
+
+function intToColor(theInt)
+{
+	var colorArray = ['rgb(166,206,227)','rgb(31,120,180)','rgb(178,223,138)','rgb(51,160,44)','rgb(251,154,153)','rgb(227,26,28)','rgb(253,191,111)','rgb(255,127,0)','rgb(202,178,214)','rgb(106,61,154)','rgb(255,255,153)','rgb(177,89,40)'];
+	var idx = theInt % 12;
+
+	return colorArray[idx];
 }
 
 function directionToColor(direction)
@@ -172,7 +181,6 @@ function drawpaths(min, max)
 				}		
 			}
 			paths.push(trajectory);
-
 		}
 		
 		for(var i=0; i<paths.length; i++)
@@ -276,7 +284,7 @@ function drawPathSpeed(min, max){
 		var svgfragment = '<svg>' + squares + '</svg>';
 
 		//Add the svg to the div
-		receptacle.innerHTML='' + svgfragment + list + title;
+		receptacle.innerHTML='' + title + svgfragment + list ;
 
 	}
 				
@@ -358,106 +366,6 @@ function animateCircle(path) {
 	  path.set('icons', icons);
 	}, 30);
 }
-
-
-
-function drawSlowdots(min, max){
-
-	currentView = "slowTraffic"; 
-
-	clearBox('infobox');
-
-	var slowTrafficArr = [];
-	var direction;
-
-	var hourMin = min||0;
-	var hourMax = max||24;
-	
-	if ((max-min)==0){
-		hourMin=0;
-		hourMax=24;
-	}
-
-	$("#loading").show();
-	document.getElementById('loading').style.visibility = 'visible';
-	setTimeout(loop, 5);
-
-	function loop()
-	{
-		clearOverlays();
-
-		for (var i=1; i<500; i++)
-		{
-			for(var j=0; j<(carData[i].length-1); j++)
-			{
-				var paths = [];
-
-				var carInfo = [];	
-
-				var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
-
-				var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
-
-				var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
-
-				var time = Math.abs(Date2-Date1)/1000;
-				
-				var velocity = distance/time*3.6;
-
-				if(velocity < 10)
-				{
-					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
-					{
-
-						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
-
-						var center1 = new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']);	
-						var center2 = new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']);	
-
-						carInfo['lat1'] = carData[i][j]['lat'];
-						carInfo['lat2'] = carData[i][j+1]['lat'];
-						carInfo['lon1'] = carData[i][j]['lon'];
-						carInfo['lon2'] = carData[i][j+1]['lon'];
-						carInfo['vel'] = velocity;
-						carInfo['dir'] = direction;
-
-						slowTrafficArr.push(carInfo);
-
-						var dot1 = new google.maps.Circle({
-						  center: center1,
-						  radius: 10,
-						  strokeColor: directionToColor(direction),
-						  strokeOpacity: 0.8,
-						  fillColor: '#F00',
-						  fillOpacity: 0.35,
-						  strokeWeight: 2,
-						});
-
-						var dot2 = new google.maps.Circle({
-						  center: center2,
-						  radius: 10,
-						  strokeColor: directionToColor(direction),
-						  strokeOpacity: 0.8,
-						  fillColor: '#F00',
-						  fillOpacity: 0.35,
-						  strokeWeight: 2,
-						});
-
-						//The path is drawn
-						dot1.setMap(map);
-						dot2.setMap(map);
-						overlays.push(dot1);
-						overlays.push(dot2);
-					}
-				}					
-
-				
-			}
-		}
-		document.getElementById('loading').style.visibility = 'hidden';
-	}
-}
-
 
 function drawSlowTraffic(min, max){
 
@@ -624,7 +532,7 @@ function drawCluster(min, max)
 	{
 		if(clusters[i].length > 15)
 		{
-			var randomC = 'rgb('+(Math.floor(Math.random()*256))+', '+(Math.floor(Math.random()*256))+', '+(Math.floor(Math.random()*256))+')';
+			var dotColor = '#F00';
 			for(var p = 0; p < clusters[i].length; p++)
 			{
 				if(Number(clusters[i][p]['hour']) >= hourMin && Number(clusters[i][p]['hour']) <= hourMax)
@@ -632,11 +540,11 @@ function drawCluster(min, max)
 					var dot = new google.maps.Circle({
 							  center: new google.maps.LatLng(clusters[i][p]['lat'], clusters[i][p]['lon']),
 							  radius: 150,
-							  strokeColor: randomC,
-							  strokeOpacity: 1,
-							  strokeWeight: 1,
-							  fillColor: randomC,
-							  fillOpacity: 0.5,
+							  strokeColor: dotColor,
+							  strokeOpacity: 0.2,
+							  strokeWeight: 2,
+							  fillColor: dotColor,
+							  fillOpacity: 0.1,
 							});
 
 					//The path is drawn

@@ -10,12 +10,17 @@
   <body>
   <div id="container">
 
-  	<ol>
-		<li><button id="clearButton" onclick="animatePaths(hourMin, hourMax)">Animate cars</button></li>
-		<li><button id="clearButton" onclick="drawPathSpeed(hourMin, hourMax)">Show car speed</button></li>
-		<li><button id="clearButton" onclick="drawpaths(hourMin, hourMax)">Show all paths</button></li>
-		<li><button id="clearButton" onclick="drawSlowTraffic(hourMin, hourMax)">Slow traffic</button></li>
-		<li><button id="clearButton" onclick="calculateCluster(hourMin, hourMax)">Potential tailback areas</button></li>
+  	<ol id="buttonList">
+  		<li><p>START HERE<p></li>
+  		<li><button id="button" onclick="drawpaths(hourMin, hourMax)">Show all paths</button></li>
+  		<li><img src="img/arrowDown.png" alt="arrow down"></li>
+		<li><button id="button" onclick="animatePaths(hourMin, hourMax)">Animate cars</button></li>
+		<li><img src="img/arrowDown.png" alt="arrow down"></li>
+		<li><button id="button" onclick="drawPathSpeed(hourMin, hourMax)">Show car speed</button></li>
+		<li><img src="img/arrowDown.png" alt="arrow down"></li>
+		<li><button id="button" onclick="drawSlowTraffic(hourMin, hourMax)">Slow traffic</button></li>
+		<li><img src="img/arrowDown.png" alt="arrow down"></li>
+		<li><button id="button" onclick="calculateCluster(hourMin, hourMax)">Potential tailback areas</button></li>
 	</ol>
 
 	<div id="timeline"></div>
@@ -111,8 +116,9 @@
 		
 			carData = readData(data);
 			
-			drawpaths();
 		});
+
+		document.getElementById('infobox').innerHTML = "<p>Welcome to this javascript visualization of the traffic in Milano.</p>";
 
 		//Function for drawing brush
 		function drawBrush()
