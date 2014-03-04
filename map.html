@@ -15,7 +15,7 @@
 		<li><button id="clearButton" onclick="drawPathSpeed(hourMin, hourMax)">Show car speed</button></li>
 		<li><button id="clearButton" onclick="drawpaths(hourMin, hourMax)">Show all paths</button></li>
 		<li><button id="clearButton" onclick="drawSlowTraffic(hourMin, hourMax)">Slow traffic</button></li>
-		<li><button id="clearButton" onclick="drawCluster(hourMin, hourMax)">Potential tailback areas</button></li>
+		<li><button id="clearButton" onclick="calculateCluster(hourMin, hourMax)">Potential tailback areas</button></li>
 	</ol>
 
 	<div id="timeline"></div>
@@ -56,6 +56,7 @@
 			
 		var carData = [];		
 		var map;
+		var clusters = [];
 
 		function initialize() {
 			var styles = [

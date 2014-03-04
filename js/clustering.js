@@ -4,7 +4,7 @@ data: Array of latitudes, longitudes and 'visited'
 rad: Radius of examination for each point in data
 minPts: Minimum density of each circle of a point
 
-returns clusterArr which is an array of clusterobjects
+returns clusterArr which is an array of clusters which conatins a set of points
 
 *******************************************************/
 function clusterDBS(data, rad, minPts)
@@ -34,6 +34,7 @@ function clusterDBS(data, rad, minPts)
 		var point = [];
 		point['lat'] = data[pointIdx]['lat'];
 		point['lon'] = data[pointIdx]['lon'];
+		point['hour'] = data[pointIdx]['hour'];
 		clusterArr[clusterIdx].push(point);
 
 		for (var n = 0; n < neighborPts.length; n++) 
@@ -54,7 +55,6 @@ function clusterDBS(data, rad, minPts)
 							neighborPts.push(neighborPts2[j]);
 					}
 				}
-			
 				//if n isn't a member of any cluster
 				//add it to a cluster
 				var memberOfCluster = false;
@@ -68,6 +68,7 @@ function clusterDBS(data, rad, minPts)
 					var point2 = [];
 					point2['lat'] = data[neighborPts[n]]['lat'];
 					point2['lon'] = data[neighborPts[n]]['lon'];
+					point2['hour'] = data[neighborPts[n]]['hour'];
 					clusterArr[clusterIdx].push(point2);
 				}
 			}
@@ -78,19 +79,21 @@ function clusterDBS(data, rad, minPts)
 	{
 		var pointArr = [];
 
-		for (var r = 0; r<data.length; r++) {
-			
-			var latRes = Number(data[pointIdx]['lat']) - Number(data[r]['lat']);
-			var lonRes = Number(data[pointIdx]['lon']) - Number(data[r]['lon']);
+		for (var r = 0; r<data.length; r++) 
+		{
+			if(data[r]['visited'] == false)
+			{
+				var latRes = Number(data[pointIdx]['lat']) - Number(data[r]['lat']);
+				var lonRes = Number(data[pointIdx]['lon']) - Number(data[r]['lon']);
 
-			var distance = Math.sqrt(latRes*latRes + lonRes*lonRes);
+				var distance = Math.sqrt(latRes*latRes + lonRes*lonRes);
 
-			if(distance <= rad)
-				pointArr.push(r);
+				if(distance <= rad)
+					pointArr.push(r);
+			}
 		}
 		return pointArr;
 	}
-
 	return clusterArr;
 }
 

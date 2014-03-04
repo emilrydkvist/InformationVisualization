@@ -62,7 +62,6 @@ function directionToColor(direction)
 		return '#a65628';
 	else if(direction == "SW")
 		return '#f781bf';
-
 }
 
 function checkDirection(lat1, lat2, lon1, lon2){
@@ -131,6 +130,8 @@ function drawCurrent(min, max){
 		animatePaths(min, max);
 	else if(currentView == "slowTraffic")
 		drawSlowTraffic(min, max);
+	else if(currentView == "cluster")
+		drawCluster(min, max);
 	else
 		alert("no view is currently set.");
 }
@@ -163,7 +164,7 @@ function drawpaths(min, max)
 		{
 			var trajectory = [];
 			
-			for(var j=0; j<2; j++)
+			for(var j=0; j<carData[i].length; j++)
 			{
 				if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
 				{
@@ -541,9 +542,9 @@ function drawSlowTraffic(min, max){
 }
 
 
-function drawCluster(min, max){
+function calculateCluster(min, max){
 
-	currentView = "slowTraffic"; 
+	currentView = "cluster"; 
 
 	clearBox('infobox');
 
@@ -583,25 +584,66 @@ function drawCluster(min, max){
 
 				if(velocity < 10)
 				{
-					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
-					{
-
-						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
+						//direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
 
 						var carInfo = [];
 						carInfo['lat'] = carData[i][j]['lat'];
 						carInfo['lon'] = carData[i][j]['lon'];
+						carInfo['hour'] = carData[i][j]['hour'];
 						carInfo['visited'] = false;
 
 						slowTrafficArr.push(carInfo);
-
-					}
 				}					
 			}
 		}
+		clusters = clusterDBS(slowTrafficArr, 0.0025, 20);
+		//good values: rad = 0.0025, minPts = 20
+		//or rad = 0.0023, minPts = 17
 
-		console.log(clusterDBS(slowTrafficArr, 0.03, 4));
+		console.log(clusters);
+		drawCluster(hourMin, hourMax)
+
 		document.getElementById('loading').style.visibility = 'hidden';
 	}
 }
 
+
+function drawCluster(min, max)
+{
+	clearOverlays();
+
+	var hourMin = min||0;
+	var hourMax = max||24;
+	
+	if ((max-min)==0){
+		hourMin=0;
+		hourMax=24;
+	}
+
+	for (var i = 0; i < clusters.length; i++)
+	{
+		if(clusters[i].length > 15)
+		{
+			var randomC = 'rgb('+(Math.floor(Math.random()*256))+', '+(Math.floor(Math.random()*256))+', '+(Math.floor(Math.random()*256))+')';
+			for(var p = 0; p < clusters[i].length; p++)
+			{
+				if(Number(clusters[i][p]['hour']) >= hourMin && Number(clusters[i][p]['hour']) <= hourMax)
+				{
+					var dot = new google.maps.Circle({
+							  center: new google.maps.LatLng(clusters[i][p]['lat'], clusters[i][p]['lon']),
+							  radius: 150,
+							  strokeColor: randomC,
+							  strokeOpacity: 1,
+							  strokeWeight: 1,
+							  fillColor: randomC,
+							  fillOpacity: 0.5,
+							});
+
+					//The path is drawn
+					dot.setMap(map);
+					overlays.push(dot);
+				}
+			}
+		}
+	}
+}
