@@ -14,6 +14,13 @@ function clearOverlays(){
 	}
 }
 
+
+//function to clear information in the infobox before you print out new info
+function clearBox(elementID)
+{
+    document.getElementById(elementID).innerHTML = "";
+}
+
 function latlonToMeters(lon1, lat1, lon2, lat2){
 	var R = 6378.137; // Radius of earth in KM
     var dLat = (lat2 - lat1) * Math.PI / 180;
@@ -132,6 +139,8 @@ function drawpaths(min, max)
 {
 	currentView = "standard";
 
+	clearBox('infobox');
+
 	var hourMin = min||0;
 	var hourMax = max||24;
 
@@ -188,6 +197,8 @@ function drawpaths(min, max)
 function drawPathSpeed(min, max){
 
 	currentView = "speed";
+
+	clearBox('infobox');
 
 	var hourMin = min||0;
 	var hourMax = max||24;
@@ -246,12 +257,15 @@ function drawPathSpeed(min, max){
 		//Update infobox
 
 		//Create the squares
+		var squares = '<rect x="20" y="100" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#F00"></rect>'+
+		'<rect x="20" y="140" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#e59400"></rect>'+ 
+		'<rect x="20" y="180" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#FF0"></rect>'+
+		'<rect x="20" y="220" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#0F0"></rect>';
 
-		//TODO NEXT: SKAPA TABELL ELLER DIV FÖR TEXTEN
-		var squares = '<rect x="20" y="100" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#F00"></rect>'+ '<p x="50" y="100"> < 7 km/h </p>' +
-		'<rect x="20" y="140" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#e59400"></rect>'+ '<p x="50" y="140"> 7-60 km/h </p>' +
-		'<rect x="20" y="180" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#FF0"></rect>'+ '<p x="50" y="180"> 60-90 km/h </p>' +
-		'<rect x="20" y="220" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#0F0"></rect>'+ '<p x="50" y="220"> > 90 km/h </p>';
+		var title = '<p>Current view: Car speeds </p>';
+
+		var textList = '<li> < 7 km/h </li>'+ '<li> 7-30 km/h </li>'+ '<li> 30-90 km/h </li>'+ '<li> > 90 km/h </li>';
+		var list = '<ol>' + textList + '</ol>';
 		//<rect x="20" y="180" rx="10" ry="10" width="30" height="30" fill="#FF0"/>
 
 		//Create the receptacle for the squares
@@ -261,17 +275,18 @@ function drawPathSpeed(min, max){
 		var svgfragment = '<svg>' + squares + '</svg>';
 
 		//Add the svg to the div
-		receptacle.innerHTML='' + svgfragment;
+		receptacle.innerHTML='' + svgfragment + list + title;
 
-		}
-		
-		
+	}
+			
 }
 
 
 function animatePaths(min, max){
 
 	currentView = "animate";
+
+	clearBox('infobox');
 
 	var hourMin = min||0;
 	var hourMax = max||24;
@@ -349,6 +364,8 @@ function drawSlowTraffic(min, max){
 
 	currentView = "slowTraffic"; 
 
+	clearBox('infobox');
+
 	var slowTrafficArr = [];
 	var direction;
 
@@ -422,4 +439,16 @@ function drawSlowTraffic(min, max){
 		}
 		document.getElementById('loading').style.visibility = 'hidden';
 	}
+}
+
+//Looking at traffic passing a border around the inner city,
+//either a direction towards the center or away from the center
+function addedTraffic()
+{
+
+	//centerpoint
+	//new google.maps.LatLng(45.467, 9.187317),
+	var cityCircle = {};
+
+	
 }
