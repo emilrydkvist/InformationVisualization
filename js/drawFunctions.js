@@ -3,6 +3,7 @@ var currentView = "";
 var hourMin = 0;
 var hourMax = 24;
 var overlays = [];
+var trafficBehaviorArr = [];
 
 
 //function to clear all overlays on the map
@@ -62,7 +63,6 @@ function directionToColor(direction)
 		return '#a65628';
 	else if(direction == "SW")
 		return '#f781bf';
-
 }
 
 function checkDirection(lat1, lat2, lon1, lon2){
@@ -131,6 +131,8 @@ function drawCurrent(min, max){
 		animatePaths(min, max);
 	else if(currentView == "slowTraffic")
 		drawSlowTraffic(min, max);
+	else if(currentView == "cluster")
+		drawCluster(min, max);
 	else
 		alert("no view is currently set.");
 }
@@ -216,7 +218,7 @@ function drawPathSpeed(min, max){
 	{
 		clearOverlays();
 
-		for (var i=1; i<100; i++)
+		for (var i=1; i<carData.length; i++)
 		{
 			for(var j=0; j<(carData[i].length-1); j++)
 			{
@@ -339,7 +341,7 @@ function animatePaths(min, max){
 			  map: map,
 			});
 
-			//Pathen ritas ut
+			//Path is painted
 			overlays.push(path);
 			animateCircle(path);
 		}	
@@ -357,8 +359,6 @@ function animateCircle(path) {
 	  path.set('icons', icons);
 	}, 30);
 }
-
-
 
 function drawSlowTraffic(min, max){
 
@@ -403,15 +403,15 @@ function drawSlowTraffic(min, max){
 				
 				var velocity = distance/time*3.6;
 
-				if(velocity < 7)
+				if(velocity < 10)
 				{
 					if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
 					{
 
+						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
+
 						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
 						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-
-						direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
 
 						carInfo['lat1'] = carData[i][j]['lat'];
 						carInfo['lat2'] = carData[i][j+1]['lat'];
@@ -421,15 +421,255 @@ function drawSlowTraffic(min, max){
 						carInfo['dir'] = direction;
 
 						slowTrafficArr.push(carInfo);
+
+						var path = new google.maps.Polyline({
+						  path: paths,
+						  geodesic: true,
+						  strokeColor: directionToColor(direction),
+						  strokeOpacity: 0.8,
+						  strokeWeight: 2,
+						});
+
+						//The path is drawn
+						path.setMap(map);
+						overlays.push(path);
+
 					}
 				}					
+			}
+		}
+		document.getElementById('loading').style.visibility = 'hidden';
+	}
+}
+
+
+function calculateCluster(min, max){
+
+	currentView = "cluster"; 
+
+	clearBox('infobox');
+
+	var slowTrafficArr = [];
+	var direction;
+
+	var hourMin = min||0;
+	var hourMax = max||24;
+	
+	if ((max-min)==0){
+		hourMin=0;
+		hourMax=24;
+	}
+
+	$("#loading").show();
+	document.getElementById('loading').style.visibility = 'visible';
+	setTimeout(loop, 5);
+
+	function loop()
+	{
+		clearOverlays();
+
+		for (var i=1; i<carData.length; i++)
+		{
+			for(var j=0; j<(carData[i].length-1); j++)
+			{
+				var carInfo = [];	
+
+				var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
+
+				var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
+				var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
+				var time = Math.abs(Date2-Date1)/1000;
+			
+				var velocity = distance/time*3.6;
+
+				if(velocity < 10)
+				{
+						//direction = checkDirection(carData[i][j]['lat'], carData[i][j+1]['lat'], carData[i][j]['lon'], carData[i][j+1]['lon']);
+
+						var carInfo = [];
+						carInfo['lat'] = carData[i][j]['lat'];
+						carInfo['lon'] = carData[i][j]['lon'];
+						carInfo['hour'] = carData[i][j]['hour'];
+						carInfo['visited'] = false;
+
+						slowTrafficArr.push(carInfo);
+				}					
+			}
+		}
+		clusters = clusterDBS(slowTrafficArr, 0.0025, 20);
+		//good values: rad = 0.0025, minPts = 20
+		//or rad = 0.0023, minPts = 17
+
+		console.log(clusters);
+		drawCluster(hourMin, hourMax)
+
+		document.getElementById('loading').style.visibility = 'hidden';
+	}
+}
+
+function drawCluster(min, max)
+{
+	clearOverlays();
+
+	var hourMin = min||0;
+	var hourMax = max||24;
+	
+	if ((max-min)==0){
+		hourMin=0;
+		hourMax=24;
+	}
+
+	for (var i = 0; i < clusters.length; i++)
+	{
+		if(clusters[i].length > 15)
+		{
+			var randomC = 'rgb('+(Math.floor(Math.random()*256))+', '+(Math.floor(Math.random()*256))+', '+(Math.floor(Math.random()*256))+')';
+			for(var p = 0; p < clusters[i].length; p++)
+			{
+				if(Number(clusters[i][p]['hour']) >= hourMin && Number(clusters[i][p]['hour']) <= hourMax)
+				{
+					var dot = new google.maps.Circle({
+							  center: new google.maps.LatLng(clusters[i][p]['lat'], clusters[i][p]['lon']),
+							  radius: 150,
+							  strokeColor: randomC,
+							  strokeOpacity: 1,
+							  strokeWeight: 1,
+							  fillColor: randomC,
+							  fillOpacity: 0.5,
+							});
+
+					//The path is drawn
+					dot.setMap(map);
+					overlays.push(dot);
+				}
+			}
+		}
+	}
+}
+
+//Looking at traffic passing a border around the inner city,
+//either a direction towards the center or away from the center
+function trafficBehavior(min, max)
+{
+
+	clearOverlays();
+
+	//centerpoint
+	var centerPoint = [45.467, 9.177317];
+	var latDiff;
+	var lonDiff;
+	var distance;
+	var rad = 0.05;
+	var startLat;
+	var startLon;
+	
+	for (var i = 1; i < 100; i++)
+	{
+		startLat = Number(carData[i][0]['lat']);
+		startLon = Number(carData[i][0]['lon']);
+
+		latDiff = startLat - centerPoint[0];
+		lonDiff = startLon - centerPoint[1];
+
+		distance = Math.sqrt(latDiff*latDiff + lonDiff*lonDiff);
+		//console.log(distance);
+
+		//Car starting outside center 
+		if(distance > rad)
+		{
+			trafficBehaviorArr[i] = "passing by";
+
+			for (var j = 1; j < carData[i].length-1; j++) 
+			{
+				startLat = Number(carData[i][j]['lat']);
+				startLon = Number(carData[i][j]['lon']);
+
+				latDiff = startLat - centerPoint[0];
+				lonDiff = startLon - centerPoint[1];
+
+				distance = Math.sqrt(latDiff*latDiff + lonDiff*lonDiff);
+
+				if(distance < rad)
+					trafficBehaviorArr[i] = "going in";
+				
+			}
+			startLat = Number(carData[i][j]['lat']);
+			startLon = Number(carData[i][j]['lon']);
+
+			latDiff = startLat - centerPoint[0];
+			lonDiff = startLon - centerPoint[1];
+
+			distance = Math.sqrt(latDiff*latDiff + lonDiff*lonDiff);
+
+			if(distance > rad && trafficBehaviorArr[i]=="going in")
+				trafficBehaviorArr[i] = "passing through";
+
+		}
+		//Car starting inside center
+		else
+		{
+			trafficBehaviorArr[i] = "inside";
+
+			for (var j = 1; j < carData[i].length-1; j++) 
+			{	
+				startLat = Number(carData[i][j]['lat']);
+				startLon = Number(carData[i][j]['lon']);
+
+				latDiff = startLat - centerPoint[0];
+				lonDiff = startLon - centerPoint[1];
+
+				distance = Math.sqrt(latDiff*latDiff) + (lonDiff*lonDiff);
+
+				if(distance > rad)
+					trafficBehaviorArr[i] = "going out";
+
+			}
+
+				startLat = Number(carData[i][j]['lat']);
+				startLon = Number(carData[i][j]['lon']);
+
+				latDiff = startLat - centerPoint[0];
+				lonDiff = startLon - centerPoint[1];
+
+				distance = Math.sqrt(latDiff*latDiff + lonDiff*lonDiff);
+
+				if(distance < rad && trafficBehaviorArr[i]=="going out")
+					trafficBehaviorArr[i] = "native traffic";
+		}
+	}
+
+	//console.log(trafficBehaviorArr);
+
+	drawTrafficBehavior(min, max);
+}
+
+function drawTrafficBehavior(min, max)
+{
+	clearOverlays();
+	var paths = [];
+
+	var hourMin = min||0;
+	var hourMax = max||24;
+	
+	if ((max-min)==0){
+		hourMin=0;
+		hourMax=24;
+	}
+
+	for (var i = 1; i < 100; i++)
+	{
+		for (var j = 0; j < carData[i].length; j++)
+		{
+			if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
+			{
+				paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
 
 				var path = new google.maps.Polyline({
 				  path: paths,
 				  geodesic: true,
-				  strokeColor: directionToColor(direction),
-				  strokeOpacity: 0.8,
-				  strokeWeight: 2,
+				  strokeColor: '#00F', //trafficBehaviorToColor(trafficBehaviorArr[i]),
+				  strokeOpacity: 0.2,
+				  strokeWeight: 1,
 				});
 
 				//The path is drawn
@@ -437,18 +677,24 @@ function drawSlowTraffic(min, max){
 				overlays.push(path);
 			}
 		}
-		document.getElementById('loading').style.visibility = 'hidden';
 	}
 }
 
-//Looking at traffic passing a border around the inner city,
-//either a direction towards the center or away from the center
-function addedTraffic()
+function trafficBehaviorToColor(status)
 {
+	if (status == "passing by")
+		return '#e41a1c';
+	else if(status == "inside")
+		return '#377eb8';
+	else if(status == "going in")
+		return '#4daf4a';
+	else if(status == "going out")
+		return '#984ea3';
+	else if(status == "passing through")
+		return '#ff7f00';
+	else if(status == "native traffic")
+		return '#ffff33';
+	else
+		return '#000;'
 
-	//centerpoint
-	//new google.maps.LatLng(45.467, 9.187317),
-	var cityCircle = {};
-
-	
 }
