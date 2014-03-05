@@ -653,7 +653,6 @@ function trafficBehavior(min, max)
 
 	function loop()
 	{
-
 	for (var i = 1; i < carData.length; i++)
 	{
 		startLat = Number(carData[i][0]['lat']);
@@ -727,11 +726,8 @@ function trafficBehavior(min, max)
 		}
 	}
 	drawTrafficBehavior(min, max);
-
 	document.getElementById('loading').style.visibility = 'hidden';
 	}
-
-	
 }
 
 function drawTrafficBehavior(min, max)
@@ -780,23 +776,22 @@ function drawTrafficBehavior(min, max)
 			overlays.push(path);
 		}
 	}	
-	
 }
 
 function trafficBehaviorToColor(status)
 {
 	if (status == "passing by")
-		return '#e41a1c';
+		return '#e41a1c'; //red
 	else if(status == "inside")
-		return '#377eb8';
+		return '#377eb8'; //blue
 	else if(status == "going in")
-		return '#a65628';
+		return '#a65628'; //brown
 	else if(status == "going out")
-		return '#984ea3';
+		return '#984ea3'; //purple
 	else if(status == "passing through")
-		return '#ff7f00';
+		return '#ff7f00'; //orange
 	else if(status == "native traffic")
-		return '#ffff33';
+		return '#ffff33'; //yellow
 	else
 		return '#000;'
 
