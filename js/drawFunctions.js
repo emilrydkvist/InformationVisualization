@@ -4,6 +4,7 @@ var hourMin = 0;
 var hourMax = 24;
 var overlays = [];
 var trafficBehaviorArr = [];
+trafficBehaviorArr[0] = "";
 
 
 //function to clear all overlays on the map
@@ -142,6 +143,8 @@ function drawCurrent(min, max){
 		drawSlowTraffic(min, max);
 	else if(currentView == "cluster")
 		drawCluster(min, max);
+	else if(currentView == "behavior")
+		drawTrafficBehavior(min, max);
 	else
 		alert("no view is currently set.");
 }
@@ -167,27 +170,21 @@ function drawpaths(min, max)
 	function loop()
 	{
 		clearOverlays();
-
-		var paths = [];
 		
 		for (var i=1; i<carData.length; i++)
 		{
-			var trajectory = [];
+			var paths = [];
 			
 			for(var j=0; j<carData[i].length; j++)
 			{
 				if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
 				{
-					trajectory.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));
+					paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));
 				}		
 			}
-			paths.push(trajectory);
-		}
-		
-		for(var i=0; i<paths.length; i++)
-		{
+
 			var path = new google.maps.Polyline({
-			  path: paths[i],
+			  path: paths,
 			  geodesic: true,
 			  strokeColor: '#00F',
 			  strokeOpacity: 0.2,
@@ -198,7 +195,6 @@ function drawpaths(min, max)
 			path.setMap(map);
 			overlays.push(path);
 		}
-		
 		document.getElementById('loading').style.visibility = 'hidden';
 	}
 }
@@ -239,11 +235,8 @@ function drawPathSpeed(min, max){
 					paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
 
 					var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
-
 					var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
-
 					var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
-
 					var time = Math.abs(Date2-Date1)/1000;
 					
 					var velocity = distance/time*3.6;
@@ -398,15 +391,11 @@ function drawSlowTraffic(min, max){
 			for(var j=0; j<(carData[i].length-1); j++)
 			{
 				var paths = [];
-
 				var carInfo = [];	
 
 				var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
-
 				var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
-
 				var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
-
 				var time = Math.abs(Date2-Date1)/1000;
 				
 				var velocity = distance/time*3.6;
@@ -483,7 +472,6 @@ function calculateCluster(min, max){
 				var carInfo = [];	
 
 				var distance = latlonToMeters(Number(carData[i][j]['lon']), Number(carData[i][j]['lat']), Number(carData[i][j+1]['lon']), Number(carData[i][j+1]['lat']));
-
 				var Date1 = new Date(07, 3, 4, carData[i][j]['hour'], carData[i][j]['min'], carData[i][j]['sec']);
 				var Date2 = new Date(07, 3, 4, carData[i][j+1]['hour'], carData[i][j+1]['min'], carData[i][j+1]['sec']);
 				var time = Math.abs(Date2-Date1)/1000;
@@ -555,12 +543,99 @@ function drawCluster(min, max)
 	}
 }
 
+var checked = [];
+checked[0] = "checked";
+checked[1] = "checked";
+checked[2] = "checked";
+checked[3] = "checked";
+checked[4] = "checked";
+checked[5] = "checked";
+
+function handleCheck(number){
+	if(checked[number] == "unchecked")
+	{
+		checked[number]="checked";
+		document.getElementById('checkbox'+number).style.opacity = '1';
+		document.getElementById('checkbox'+number).style.border = '1px solid';
+	}
+	else if(checked[number] == "checked")
+	{
+		checked[number] = "unchecked";
+		document.getElementById('checkbox'+number).style.opacity = '0.4';
+		document.getElementById('checkbox'+number).style.border = '';
+	}
+	drawTrafficBehavior(hourMin, hourMax);
+}
+
+
 //Looking at traffic passing a border around the inner city,
 //either a direction towards the center or away from the center
 function trafficBehavior(min, max)
 {
+	currentView = "behavior";
 
-	clearOverlays();
+
+	/****************Content of infobox****************
+	****************************************************/
+
+	clearBox('infobox');
+    var infobox = document.getElementById('infobox');
+
+    infobox.innerHTML = '<p>Try to click som squares, biatch<p>';
+	
+	//check all checkboxes
+	for (var i = 0; i < checked.length; i++) {
+		checked[i] = "checked";
+	}
+
+	/****************checkboxes******************/
+	infobox.innerHTML += '<div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div>';
+	document.getElementById('checkbox0').style.backgroundColor = "#e41a1c";
+	document.getElementById('checkbox0').style.height = '20px';
+	document.getElementById('checkbox0').style.width = '20px';
+	document.getElementById('checkbox0').style.borderRadius='5px';
+	document.getElementById('checkbox0').style.border = '1px solid';
+
+	infobox.innerHTML += '<div class="checkboxes" id="checkbox1" onclick="handleCheck('+1+')"></div>';
+	document.getElementById('checkbox1').style.backgroundColor = "#377eb8";
+	document.getElementById('checkbox1').style.height = '20px';
+	document.getElementById('checkbox1').style.width = '20px';
+	document.getElementById('checkbox1').style.borderRadius='5px';
+	document.getElementById('checkbox1').style.border = '1px solid';
+
+	infobox.innerHTML += '<div class="checkboxes" id="checkbox2" onclick="handleCheck('+2+')"></div>';
+	document.getElementById('checkbox2').style.backgroundColor = "#a65628";
+	document.getElementById('checkbox2').style.height = '20px';
+	document.getElementById('checkbox2').style.width = '20px';
+	document.getElementById('checkbox2').style.borderRadius='5px';
+	document.getElementById('checkbox2').style.border = '1px solid';
+
+	infobox.innerHTML += '<div class="checkboxes" id="checkbox3" onclick="handleCheck('+3+')"></div>';
+	document.getElementById('checkbox3').style.backgroundColor = "#984ea3";
+	document.getElementById('checkbox3').style.height = '20px';
+	document.getElementById('checkbox3').style.width = '20px';
+	document.getElementById('checkbox3').style.borderRadius='5px';
+	document.getElementById('checkbox3').style.border = '1px solid';
+
+	infobox.innerHTML += '<div class="checkboxes" id="checkbox4" onclick="handleCheck('+4+')"></div>';
+	document.getElementById('checkbox4').style.backgroundColor = "#ff7f00";
+	document.getElementById('checkbox4').style.height = '20px';
+	document.getElementById('checkbox4').style.width = '20px';
+	document.getElementById('checkbox4').style.borderRadius='5px';
+	document.getElementById('checkbox4').style.border = '1px solid';
+
+	infobox.innerHTML += '<div class="checkboxes" id="checkbox5" onclick="handleCheck('+5+')"></div>';
+	document.getElementById('checkbox5').style.backgroundColor = "#ffff33";
+	document.getElementById('checkbox5').style.height = '20px';
+	document.getElementById('checkbox5').style.width = '20px';
+	document.getElementById('checkbox5').style.borderRadius='5px';
+	document.getElementById('checkbox5').style.border = '1px solid';
+	/************end of checkboxes**************/
+
+
+
+	/************end of content for infobox**********
+	*************************************************/
 
 	//centerpoint
 	var centerPoint = [45.467, 9.177317];
@@ -571,7 +646,15 @@ function trafficBehavior(min, max)
 	var startLat;
 	var startLon;
 	
-	for (var i = 1; i < 100; i++)
+
+	$("#loading").show();
+	document.getElementById('loading').style.visibility = 'visible';
+	setTimeout(loop, 10);
+
+	function loop()
+	{
+
+	for (var i = 1; i < carData.length; i++)
 	{
 		startLat = Number(carData[i][0]['lat']);
 		startLon = Number(carData[i][0]['lon']);
@@ -587,7 +670,7 @@ function trafficBehavior(min, max)
 		{
 			trafficBehaviorArr[i] = "passing by";
 
-			for (var j = 1; j < carData[i].length-1; j++) 
+			for (var j = 1; j < (carData[i].length-1); j++) 
 			{
 				startLat = Number(carData[i][j]['lat']);
 				startLon = Number(carData[i][j]['lon']);
@@ -612,13 +695,12 @@ function trafficBehavior(min, max)
 			if(distance > rad && trafficBehaviorArr[i]=="going in")
 				trafficBehaviorArr[i] = "passing through";
 
-		}
-		//Car starting inside center
+		}//Car starting inside center
 		else
 		{
 			trafficBehaviorArr[i] = "inside";
 
-			for (var j = 1; j < carData[i].length-1; j++) 
+			for (var j = 1; j < (carData[i].length-1); j++) 
 			{	
 				startLat = Number(carData[i][j]['lat']);
 				startLon = Number(carData[i][j]['lon']);
@@ -630,7 +712,6 @@ function trafficBehavior(min, max)
 
 				if(distance > rad)
 					trafficBehaviorArr[i] = "going out";
-
 			}
 
 				startLat = Number(carData[i][j]['lat']);
@@ -645,16 +726,17 @@ function trafficBehavior(min, max)
 					trafficBehaviorArr[i] = "native traffic";
 		}
 	}
-
-	//console.log(trafficBehaviorArr);
-
 	drawTrafficBehavior(min, max);
+
+	document.getElementById('loading').style.visibility = 'hidden';
+	}
+
+	
 }
 
 function drawTrafficBehavior(min, max)
 {
 	clearOverlays();
-	var paths = [];
 
 	var hourMin = min||0;
 	var hourMax = max||24;
@@ -664,28 +746,41 @@ function drawTrafficBehavior(min, max)
 		hourMax=24;
 	}
 
-	for (var i = 1; i < 100; i++)
-	{
-		for (var j = 0; j < carData[i].length; j++)
-		{
-			if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
-			{
-				paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+	var checkStatus = [];
+	checkStatus['passing by'] = 0;
+	checkStatus['inside'] = 1;
+	checkStatus['going in'] = 2;
+	checkStatus['going out'] = 3;
+	checkStatus['passing through'] = 4;
+	checkStatus['native traffic'] = 5;
 
-				var path = new google.maps.Polyline({
+	for (var i = 1; i < carData.length; i++)
+	{
+		if(checked[checkStatus[trafficBehaviorArr[i]]] == "checked")
+		{
+			var paths = [];
+
+			for (var j = 0; j < carData[i].length; j++)
+			{
+				if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
+				{
+					paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+				}
+			}
+
+			var path = new google.maps.Polyline({
 				  path: paths,
 				  geodesic: true,
-				  strokeColor: '#00F', //trafficBehaviorToColor(trafficBehaviorArr[i]),
-				  strokeOpacity: 0.2,
+				  strokeColor: trafficBehaviorToColor(trafficBehaviorArr[i]),
+				  strokeOpacity: 0.4,
 				  strokeWeight: 1,
 				});
-
-				//The path is drawn
-				path.setMap(map);
-				overlays.push(path);
-			}
+			//The path is drawn
+			path.setMap(map);
+			overlays.push(path);
 		}
-	}
+	}	
+	
 }
 
 function trafficBehaviorToColor(status)
@@ -695,7 +790,7 @@ function trafficBehaviorToColor(status)
 	else if(status == "inside")
 		return '#377eb8';
 	else if(status == "going in")
-		return '#4daf4a';
+		return '#a65628';
 	else if(status == "going out")
 		return '#984ea3';
 	else if(status == "passing through")

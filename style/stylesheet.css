@@ -58,6 +58,10 @@ body {
 	font-family:"impact";
 }
 
+.checkboxes{
+	margin: 5px;
+}
+
 #timeline{
 	position: relative;
 	top: 200px;
