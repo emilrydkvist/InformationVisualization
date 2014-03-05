@@ -559,8 +559,7 @@ function drawCluster(min, max)
 //either a direction towards the center or away from the center
 function trafficBehavior(min, max)
 {
-
-	clearOverlays();
+	clearBox('infobox');
 
 	//centerpoint
 	var centerPoint = [45.467, 9.177317];
@@ -571,7 +570,7 @@ function trafficBehavior(min, max)
 	var startLat;
 	var startLon;
 	
-	for (var i = 1; i < 100; i++)
+	for (var i = 1; i < carData.length; i++)
 	{
 		startLat = Number(carData[i][0]['lat']);
 		startLon = Number(carData[i][0]['lon']);
@@ -648,13 +647,26 @@ function trafficBehavior(min, max)
 
 	//console.log(trafficBehaviorArr);
 
+	var receptacle = document.getElementById('infobox');
+
+	var checkBoxes = '<input type="checkbox" name="passing by" value="passing by" style="background-color:#00FF00;">Traffic passing by Milano <br>' +
+					'<input type="checkbox" name="inside" value="inside">Traffic staying inside of Milano <br>' +
+					'<input type="checkbox" name="going in" value="going in">Traffic going in to Milano <br>' +
+					'<input type="checkbox" name="going out" value="going out">Traffic going out of Milano <br>' +
+					'<input type="checkbox" name="passing through" value="passing through">Traffic passing through Milano <br>' +
+					'<input type="checkbox" name="native traffic" value="native traffic">Traffic going out of Milano and back <br>';
+
+	var submit = '<input type="submit" value="submit">';
+	var form = '<form>' + checkBoxes + submit + '</form>';
+
+	receptacle.innerHTML = '' + form;
+
 	drawTrafficBehavior(min, max);
 }
 
 function drawTrafficBehavior(min, max)
 {
 	clearOverlays();
-	var paths = [];
 
 	var hourMin = min||0;
 	var hourMax = max||24;
@@ -664,44 +676,50 @@ function drawTrafficBehavior(min, max)
 		hourMax=24;
 	}
 
-	for (var i = 1; i < 100; i++)
+	for (var i = 1; i < carData.length; i++)
 	{
+		var paths = [];
+
 		for (var j = 0; j < carData[i].length; j++)
 		{
 			if(Number(carData[i][j]['hour']) >= hourMin && Number(carData[i][j]['hour']) <= hourMax)
 			{
-				paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-
-				var path = new google.maps.Polyline({
-				  path: paths,
-				  geodesic: true,
-				  strokeColor: '#00F', //trafficBehaviorToColor(trafficBehaviorArr[i]),
-				  strokeOpacity: 0.2,
-				  strokeWeight: 1,
-				});
-
-				//The path is drawn
-				path.setMap(map);
-				overlays.push(path);
+				paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));					
 			}
+
 		}
+		
+		var path = new google.maps.Polyline({
+		  path: paths,
+		  geodesic: true,
+		  strokeColor: trafficBehaviorToColor(trafficBehaviorArr[i]),
+		  strokeOpacity: 0.2,
+		  strokeWeight: 1,
+		});
+
+		//The path is drawn
+		path.setMap(map);
+		overlays.push(path);
+		
 	}
+
+	
 }
 
 function trafficBehaviorToColor(status)
 {
 	if (status == "passing by")
-		return '#e41a1c';
+		return '#e41a1c'; //red
 	else if(status == "inside")
-		return '#377eb8';
+		return '#377eb8'; //blue
 	else if(status == "going in")
-		return '#4daf4a';
+		return '#4daf4a'; //green
 	else if(status == "going out")
-		return '#984ea3';
+		return '#984ea3'; //purple
 	else if(status == "passing through")
-		return '#ff7f00';
+		return '#ff7f00'; //orange
 	else if(status == "native traffic")
-		return '#ffff33';
+		return '#ffff33'; //yellow
 	else
 		return '#000;'
 
