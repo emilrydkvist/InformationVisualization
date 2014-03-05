@@ -22,7 +22,8 @@ function clearBox(elementID)
     document.getElementById(elementID).innerHTML = "";
 }
 
-function latlonToMeters(lon1, lat1, lon2, lat2){
+function latlonToMeters(lon1, lat1, lon2, lat2)
+{
 	var R = 6378.137; // Radius of earth in KM
     var dLat = (lat2 - lat1) * Math.PI / 180;
     var dLon = (lon2 - lon1) * Math.PI / 180;
@@ -43,6 +44,14 @@ function velocityToColor(velocity){
 		return '#FF0';
 	else
 		return '#0F0';
+}
+
+function intToColor(theInt)
+{
+	var colorArray = ['rgb(166,206,227)','rgb(31,120,180)','rgb(178,223,138)','rgb(51,160,44)','rgb(251,154,153)','rgb(227,26,28)','rgb(253,191,111)','rgb(255,127,0)','rgb(202,178,214)','rgb(106,61,154)','rgb(255,255,153)','rgb(177,89,40)'];
+	var idx = theInt % 12;
+
+	return colorArray[idx];
 }
 
 function directionToColor(direction)
@@ -173,7 +182,6 @@ function drawpaths(min, max)
 				}		
 			}
 			paths.push(trajectory);
-
 		}
 		
 		for(var i=0; i<paths.length; i++)
@@ -277,7 +285,7 @@ function drawPathSpeed(min, max){
 		var svgfragment = '<svg>' + squares + '</svg>';
 
 		//Add the svg to the div
-		receptacle.innerHTML='' + svgfragment + list + title;
+		receptacle.innerHTML='' + title + svgfragment + list ;
 
 	}
 			
@@ -523,7 +531,7 @@ function drawCluster(min, max)
 	{
 		if(clusters[i].length > 15)
 		{
-			var randomC = 'rgb('+(Math.floor(Math.random()*256))+', '+(Math.floor(Math.random()*256))+', '+(Math.floor(Math.random()*256))+')';
+			var dotColor = '#F00';
 			for(var p = 0; p < clusters[i].length; p++)
 			{
 				if(Number(clusters[i][p]['hour']) >= hourMin && Number(clusters[i][p]['hour']) <= hourMax)
@@ -531,11 +539,11 @@ function drawCluster(min, max)
 					var dot = new google.maps.Circle({
 							  center: new google.maps.LatLng(clusters[i][p]['lat'], clusters[i][p]['lon']),
 							  radius: 150,
-							  strokeColor: randomC,
-							  strokeOpacity: 1,
-							  strokeWeight: 1,
-							  fillColor: randomC,
-							  fillOpacity: 0.5,
+							  strokeColor: dotColor,
+							  strokeOpacity: 0.2,
+							  strokeWeight: 2,
+							  fillColor: dotColor,
+							  fillOpacity: 0.1,
 							});
 
 					//The path is drawn
