@@ -59,7 +59,7 @@ body {
 }
 
 .checkboxes{
-	margin: 5px;
+	
 }
 
 #timeline{
@@ -118,6 +118,27 @@ body {
 	font-family: sans-serif;
 	font-size: 16px;
 	list-style-type:none;
+}
+
+/*#infobox td{
+	height: 25px;
+}*/
+#infobox table, tr, td{
+	margin: 0px;
+	padding: 0px;
+	font-size: 12px;
+	height: 25px;
+	overflow: hidden;
+}
+#infobox table{
+	border-collapse: collapse;
+}
+#infobox td{
+	padding-right: 3px;
+	height: 36px;
+}
+#infobox tr{
+	line-height: 12px;
 }
 
 #loading {

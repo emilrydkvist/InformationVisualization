@@ -581,7 +581,7 @@ function trafficBehavior(min, max)
 	clearBox('infobox');
     var infobox = document.getElementById('infobox');
 
-    infobox.innerHTML = '<p>Try to click som squares, biatch<p>';
+    infobox.innerHTML = '<p>Traffic behavior</p>';
 	
 	//check all checkboxes
 	for (var i = 0; i < checked.length; i++) {
@@ -589,47 +589,49 @@ function trafficBehavior(min, max)
 	}
 
 	/****************checkboxes******************/
-	infobox.innerHTML += '<div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div>';
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div></td><td><p>Cars passing by Milano</p></td></tr></table>';
 	document.getElementById('checkbox0').style.backgroundColor = "#e41a1c";
 	document.getElementById('checkbox0').style.height = '20px';
 	document.getElementById('checkbox0').style.width = '20px';
 	document.getElementById('checkbox0').style.borderRadius='5px';
 	document.getElementById('checkbox0').style.border = '1px solid';
 
-	infobox.innerHTML += '<div class="checkboxes" id="checkbox1" onclick="handleCheck('+1+')"></div>';
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox1" onclick="handleCheck('+1+')"></div></td><td><p>Cars never leaving the core of Milano</p></td></tr></table>';
 	document.getElementById('checkbox1').style.backgroundColor = "#377eb8";
 	document.getElementById('checkbox1').style.height = '20px';
 	document.getElementById('checkbox1').style.width = '20px';
 	document.getElementById('checkbox1').style.borderRadius='5px';
 	document.getElementById('checkbox1').style.border = '1px solid';
 
-	infobox.innerHTML += '<div class="checkboxes" id="checkbox2" onclick="handleCheck('+2+')"></div>';
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox2" onclick="handleCheck('+2+')"></div></td><td><p>Cars entering the core of Milano</p></td></tr></table>';
 	document.getElementById('checkbox2').style.backgroundColor = "#a65628";
 	document.getElementById('checkbox2').style.height = '20px';
 	document.getElementById('checkbox2').style.width = '20px';
 	document.getElementById('checkbox2').style.borderRadius='5px';
 	document.getElementById('checkbox2').style.border = '1px solid';
 
-	infobox.innerHTML += '<div class="checkboxes" id="checkbox3" onclick="handleCheck('+3+')"></div>';
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox3" onclick="handleCheck('+3+')"></div></td><td><p>Cars leaving the core of Milano</p></td></tr></table>';
 	document.getElementById('checkbox3').style.backgroundColor = "#984ea3";
 	document.getElementById('checkbox3').style.height = '20px';
 	document.getElementById('checkbox3').style.width = '20px';
 	document.getElementById('checkbox3').style.borderRadius='5px';
 	document.getElementById('checkbox3').style.border = '1px solid';
 
-	infobox.innerHTML += '<div class="checkboxes" id="checkbox4" onclick="handleCheck('+4+')"></div>';
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox4" onclick="handleCheck('+4+')"></div></td><td><p>Cars passing through the core of Milano</p></td></tr></table>';
 	document.getElementById('checkbox4').style.backgroundColor = "#ff7f00";
 	document.getElementById('checkbox4').style.height = '20px';
 	document.getElementById('checkbox4').style.width = '20px';
 	document.getElementById('checkbox4').style.borderRadius='5px';
 	document.getElementById('checkbox4').style.border = '1px solid';
 
-	infobox.innerHTML += '<div class="checkboxes" id="checkbox5" onclick="handleCheck('+5+')"></div>';
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox5" onclick="handleCheck('+5+')"></div></td><td><p>Cars leaving and returning to the core of Milano</p></td></tr></table>';
 	document.getElementById('checkbox5').style.backgroundColor = "#ffff33";
 	document.getElementById('checkbox5').style.height = '20px';
 	document.getElementById('checkbox5').style.width = '20px';
 	document.getElementById('checkbox5').style.borderRadius='5px';
 	document.getElementById('checkbox5').style.border = '1px solid';
+
+	//infobox.innerHTML += '</table>';
 	/************end of checkboxes**************/
 
 
