@@ -3,11 +3,12 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" href="style/stylesheet.css" type="text/css"/>
+	   
   </head>
-
   <body>
-  <div id="header">
-  </div>
+  	<div id="header">
+  		<h2><a href="map.html">Information visualization of traffic in Milano</a></h2>
+  	</div>
   <div id="container">
   	
   	<ol id="buttonList">
@@ -16,7 +17,7 @@
   		<li><img src="img/arrowDown.png" alt="arrow down"></li>
 		<li><button id="button" onclick="animatePaths(hourMin, hourMax)">Animate cars</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
-		<li><button id="button" onclick="drawPathSpeed(hourMin, hourMax)">Show car speed</button></li>
+		<li><button id="button" onclick="drawPathSpeed(hourMin, hourMax);drawInfobox();">Show car speed</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
 		<li><button id="button" onclick="drawSlowTraffic(hourMin, hourMax)">Slow traffic</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
@@ -152,9 +153,9 @@
 				.call(timeAxis)
 				.append("text")
 				.attr("class", "label")
-				.attr("x", (width/2)-50)
+				.attr("x", (width/2)-30)
 				.attr("y", -10)
-				.text("Interactive Timeline");
+				.text("Timeline");
 
 			//Create brush
 			var brush = d3.svg.brush();

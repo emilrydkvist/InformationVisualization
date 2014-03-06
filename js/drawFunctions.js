@@ -202,8 +202,6 @@ function drawPathSpeed(min, max){
 
 	currentView = "speed";
 
-	clearBox('infobox');
-
 	var hourMin = min||0;
 	var hourMax = max||24;
 	
@@ -239,6 +237,27 @@ function drawPathSpeed(min, max){
 					
 					var velocity = distance/time*3.6;
 
+					/*//Cars driving in 10km/h or less
+					if(checkedSpeed[0] == "checked" && velocity < 10){
+						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
+					}
+					//Cars driving between 10 and 30 km/h
+					else if(checkedSpeed[1] == "checked" && velocity >= 10 && velocity < 30){
+						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
+					}
+					//Cars driving between 30 and 90 km/h
+					else if(checkedSpeed[2] == "checked" && velocity >= 30 && velocity < 90){
+						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
+					}
+					//Cars driving in 90km/h or more
+					else if(checkedSpeed[3] == "checked" && velocity >= 90){
+						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
+						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
+					}*/
+
 					var path = new google.maps.Polyline({
 					  path: paths,
 					  geodesic: true,
@@ -258,7 +277,7 @@ function drawPathSpeed(min, max){
 		//Update infobox
 
 		//Create the squares
-		var squares = '<rect x="20" y="100" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#F00"></rect>'+
+		/*var squares = '<rect x="20" y="100" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#F00"></rect>'+
 		'<rect x="20" y="140" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#e59400"></rect>'+ 
 		'<rect x="20" y="180" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#FF0"></rect>'+
 		'<rect x="20" y="220" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#0F0"></rect>';
@@ -276,12 +295,68 @@ function drawPathSpeed(min, max){
 		var svgfragment = '<svg>' + squares + '</svg>';
 
 		//Add the svg to the div
-		receptacle.innerHTML='' + title + svgfragment + list ;
+		receptacle.innerHTML='' + title + svgfragment + list ;*/
 
 	}
 			
 }
 
+function drawInfobox()
+{
+	clearBox('infobox');
+
+	infobox.innerHTML += '<p>Traffic in Milano colored by velocity</p>'
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes2" id="checkboxSpeed0"></div></td><td><p>< 10 km/h</p></td></tr></table>';
+	document.getElementById('checkboxSpeed0').style.backgroundColor = "#F00";
+	document.getElementById('checkboxSpeed0').style.height = '20px';
+	document.getElementById('checkboxSpeed0').style.width = '20px';
+	document.getElementById('checkboxSpeed0').style.borderRadius='5px';
+	document.getElementById('checkboxSpeed0').style.border = '1px solid';
+
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes2" id="checkboxSpeed1"></div></td><td><p>10-30 km/h</p></td></tr></table>';
+	document.getElementById('checkboxSpeed1').style.backgroundColor = "#e59400";
+	document.getElementById('checkboxSpeed1').style.height = '20px';
+	document.getElementById('checkboxSpeed1').style.width = '20px';
+	document.getElementById('checkboxSpeed1').style.borderRadius='5px';
+	document.getElementById('checkboxSpeed1').style.border = '1px solid';
+
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes2" id="checkboxSpeed2"</div></td><td><p>30-90 km/h</p></td></tr></table>';
+	document.getElementById('checkboxSpeed2').style.backgroundColor = "#FF0";
+	document.getElementById('checkboxSpeed2').style.height = '20px';
+	document.getElementById('checkboxSpeed2').style.width = '20px';
+	document.getElementById('checkboxSpeed2').style.borderRadius='5px';
+	document.getElementById('checkboxSpeed2').style.border = '1px solid';
+
+	infobox.innerHTML += '<table><tr><td><div class="checkboxes2" id="checkboxSpeed3"></div></td><td><p> > 90 km/h</p></td></tr></table>';
+	document.getElementById('checkboxSpeed3').style.backgroundColor = "#0F0";
+	document.getElementById('checkboxSpeed3').style.height = '20px';
+	document.getElementById('checkboxSpeed3').style.width = '20px';
+	document.getElementById('checkboxSpeed3').style.borderRadius='5px';
+	document.getElementById('checkboxSpeed3').style.border = '1px solid';
+}
+
+/*
+var checkedSpeed = [];
+checkedSpeed[0] = "checked";
+checkedSpeed[1] = "checked";
+checkedSpeed[2] = "checked";
+checkedSpeed[3] = "checked";
+
+function handleCheckSpeed(number){
+	if(checkedSpeed[number] == "unchecked")
+	{
+		checkedSpeed[number]="checked";
+		document.getElementById('checkboxSpeed'+number).style.opacity = '1';
+		document.getElementById('checkboxSpeed'+number).style.border = '1px solid';
+	}
+	else if(checkedSpeed[number] == "checked")
+	{
+		checkedSpeed[number] = "unchecked";
+		document.getElementById('checkboxSpeed'+number).style.opacity = '0.5';
+		document.getElementById('checkboxSpeed'+number).style.border = '';
+	}
+	drawPathSpeed(hourMin, hourMax);
+}*/
 
 function animatePaths(min, max){
 
