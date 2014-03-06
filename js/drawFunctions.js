@@ -147,11 +147,19 @@ function drawCurrent(min, max){
 		drawTrafficBehavior(min, max);
 }
 
+
+function drawpathsInfo()
+{
+	clearBox('infobox');
+	document.getElementById('infobox').innerHTML = '<p>The blue lines on the map each represents the trajectory of a car.'+ 
+	'The dataset which this visualization is based upon contains gps-data from 1239 cars that have been driving around Milano. <br/>'+ 
+	'This view is not very useful but is quite beuatiful to look at. <br/><br/>'+ 
+	'You can use the interactive timeline at any time to filter the data.</p>';
+}
+
 function drawpaths(min, max)
 {
 	currentView = "standard";
-
-	clearBox('infobox');
 
 	var hourMin = min||0;
 	var hourMax = max||24;
@@ -494,7 +502,6 @@ function calculateCluster(min, max){
 		//good values: rad = 0.0025, minPts = 20
 		//or rad = 0.0023, minPts = 17
 
-		console.log(clusters);
 		drawCluster(hourMin, hourMax)
 
 		document.getElementById('loading').style.visibility = 'hidden';
@@ -560,7 +567,7 @@ function handleCheck(number){
 	{
 		checked[number] = "unchecked";
 		document.getElementById('checkbox'+number).style.opacity = '0.5';
-		document.getElementById('checkbox'+number).style.border = '';
+		document.getElementById('checkbox'+number).style.border = '1px solid #DDD';
 	}
 	drawTrafficBehavior(hourMin, hourMax);
 }
@@ -572,71 +579,6 @@ function trafficBehavior(min, max)
 {
 	currentView = "behavior";
 
-	/****************Content of infobox****************
-	****************************************************/
-
-	clearBox('infobox');
-    var infobox = document.getElementById('infobox');
-
-    infobox.innerHTML = '<p>Traffic behavior</p>';
-	
-	//check all checkboxes
-	for (var i = 0; i < checked.length; i++) {
-		checked[i] = "unchecked";
-	}
-
-	var boxOpacity = 0.5;
-
-	/****************checkboxes******************/
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div></td><td><p>Cars passing by Milano</p></td></tr></table>';
-	document.getElementById('checkbox0').style.backgroundColor = "#e41a1c";
-	document.getElementById('checkbox0').style.height = '20px';
-	document.getElementById('checkbox0').style.width = '20px';
-	document.getElementById('checkbox0').style.borderRadius='5px';
-	document.getElementById('checkbox0').style.opacity = boxOpacity;
-
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox1" onclick="handleCheck('+1+')"></div></td><td><p>Cars never leaving the core of Milano</p></td></tr></table>';
-	document.getElementById('checkbox1').style.backgroundColor = "#377eb8";
-	document.getElementById('checkbox1').style.height = '20px';
-	document.getElementById('checkbox1').style.width = '20px';
-	document.getElementById('checkbox1').style.borderRadius='5px';
-	document.getElementById('checkbox1').style.opacity = boxOpacity;
-
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox2" onclick="handleCheck('+2+')"></div></td><td><p>Cars entering the core of Milano</p></td></tr></table>';
-	document.getElementById('checkbox2').style.backgroundColor = "#a65628";
-	document.getElementById('checkbox2').style.height = '20px';
-	document.getElementById('checkbox2').style.width = '20px';
-	document.getElementById('checkbox2').style.borderRadius='5px';
-	document.getElementById('checkbox2').style.opacity = boxOpacity;
-
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox3" onclick="handleCheck('+3+')"></div></td><td><p>Cars leaving the core of Milano</p></td></tr></table>';
-	document.getElementById('checkbox3').style.backgroundColor = "#984ea3";
-	document.getElementById('checkbox3').style.height = '20px';
-	document.getElementById('checkbox3').style.width = '20px';
-	document.getElementById('checkbox3').style.borderRadius='5px';
-	document.getElementById('checkbox3').style.opacity = boxOpacity;
-
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox4" onclick="handleCheck('+4+')"></div></td><td><p>Cars passing through the core of Milano</p></td></tr></table>';
-	document.getElementById('checkbox4').style.backgroundColor = "#ff7f00";
-	document.getElementById('checkbox4').style.height = '20px';
-	document.getElementById('checkbox4').style.width = '20px';
-	document.getElementById('checkbox4').style.borderRadius='5px';
-	document.getElementById('checkbox4').style.opacity = boxOpacity;
-
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes" id="checkbox5" onclick="handleCheck('+5+')"></div></td><td><p>Cars leaving and returning to the core of Milano</p></td></tr></table>';
-	document.getElementById('checkbox5').style.backgroundColor = "#ffff33";
-	document.getElementById('checkbox5').style.height = '20px';
-	document.getElementById('checkbox5').style.width = '20px';
-	document.getElementById('checkbox5').style.borderRadius='5px';
-	document.getElementById('checkbox5').style.opacity = boxOpacity;
-
-	/************end of checkboxes**************/
-
-
-
-	/************end of content for infobox**********
-	*************************************************/
-
 	//centerpoint
 	var centerPoint = [45.467, 9.177317];
 	var latDiff;
@@ -645,7 +587,7 @@ function trafficBehavior(min, max)
 	var rad = 0.05;
 	var startLat;
 	var startLon;
-	
+	var carsInCore = 0;
 
 	$("#loading").show();
 	document.getElementById('loading').style.visibility = 'visible';
@@ -681,7 +623,6 @@ function trafficBehavior(min, max)
 
 				if(distance < rad)
 					trafficBehaviorArr[i] = "going in";
-				
 			}
 			startLat = Number(carData[i][j]['lat']);
 			startLon = Number(carData[i][j]['lon']);
@@ -712,19 +653,73 @@ function trafficBehavior(min, max)
 				if(distance > rad)
 					trafficBehaviorArr[i] = "going out";
 			}
+			startLat = Number(carData[i][j]['lat']);
+			startLon = Number(carData[i][j]['lon']);
 
-				startLat = Number(carData[i][j]['lat']);
-				startLon = Number(carData[i][j]['lon']);
+			latDiff = startLat - centerPoint[0];
+			lonDiff = startLon - centerPoint[1];
 
-				latDiff = startLat - centerPoint[0];
-				lonDiff = startLon - centerPoint[1];
+			distance = Math.sqrt(latDiff*latDiff + lonDiff*lonDiff);
 
-				distance = Math.sqrt(latDiff*latDiff + lonDiff*lonDiff);
-
-				if(distance < rad && trafficBehaviorArr[i]=="going out")
-					trafficBehaviorArr[i] = "native traffic";
+			if(distance < rad && trafficBehaviorArr[i]=="going out")
+				trafficBehaviorArr[i] = "native traffic";
 		}
+		if(trafficBehaviorArr[i] == "going in" || trafficBehaviorArr[i] == "passing through")
+			carsInCore++;
 	}
+
+	/****************Content of infobox****************
+	****************************************************/
+
+	clearBox('infobox');
+    var infobox = document.getElementById('infobox');
+
+    infobox.innerHTML = '<p>This view visualizes how much traffic is added to Milano\'s core during a day. Out of '+carData.length+' cars, '+carsInCore+' enters the core of Milano and adds to the traffic that is already there. <br/><br/>Click the boxes below to see how cars travel around the core of Milano.</p>';
+	
+	//check all checkboxes
+	for (var i = 0; i < checked.length; i++) {
+		checked[i] = "unchecked";
+	}
+
+	var boxOpacity = 0.5;
+
+	/****************checkboxes******************/
+	var checkboxDivs = "";
+
+	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars passing by Milano</div></td></tr>';
+	
+	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox1" onclick="handleCheck('+1+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars never leaving the core of Milano</div></td></tr>';
+
+	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox2" onclick="handleCheck('+2+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars entering the core of Milano and staying</div></td></tr>';
+
+	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox3" onclick="handleCheck('+3+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars leaving the core of Milano</div></td></tr>';
+
+	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox4" onclick="handleCheck('+4+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars passing through the core of Milano</div></td></tr>';
+
+	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox5" onclick="handleCheck('+5+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars leaving and returning to the core of Milano</div></td></tr>';
+
+	infobox.innerHTML += '<table>'+checkboxDivs+'</table>';
+
+	document.getElementById('checkbox0').style.backgroundColor = "#e41a1c";
+	document.getElementById('checkbox1').style.backgroundColor = "#377eb8";
+	document.getElementById('checkbox2').style.backgroundColor = "#a65628";
+	document.getElementById('checkbox3').style.backgroundColor = "#984ea3";
+	document.getElementById('checkbox4').style.backgroundColor = "#ff7f00";
+	document.getElementById('checkbox5').style.backgroundColor = "#ffff33";
+
+
+	for (var i = 0; i < checked.length; i++) {
+		document.getElementById('checkbox'+i).style.height = '20px';
+		document.getElementById('checkbox'+i).style.width = '20px';
+		document.getElementById('checkbox'+i).style.borderRadius='5px';
+		document.getElementById('checkbox'+i).style.opacity = boxOpacity;
+		document.getElementById('checkbox'+i).style.border = '1px solid #DDD';
+	}
+	/************end of checkboxes**************/
+
+	/************end of content for infobox**********
+	*************************************************/
+
 	drawTrafficBehavior(min, max);
 	document.getElementById('loading').style.visibility = 'hidden';
 	}
