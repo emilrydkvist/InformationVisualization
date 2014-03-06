@@ -3,11 +3,11 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" href="style/stylesheet.css" type="text/css"/>
-	
-	
-    
   </head>
+
   <body>
+  <div id="header">
+  </div>
   <div id="container">
   	
   	<ol id="buttonList">
@@ -152,9 +152,9 @@
 				.call(timeAxis)
 				.append("text")
 				.attr("class", "label")
-				.attr("x", (width/2)-30)
+				.attr("x", (width/2)-50)
 				.attr("y", -10)
-				.text("Timeline");
+				.text("Interactive Timeline");
 
 			//Create brush
 			var brush = d3.svg.brush();

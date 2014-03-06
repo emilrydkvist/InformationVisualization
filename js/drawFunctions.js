@@ -145,8 +145,6 @@ function drawCurrent(min, max){
 		drawCluster(min, max);
 	else if(currentView == "behavior")
 		drawTrafficBehavior(min, max);
-	else
-		alert("no view is currently set.");
 }
 
 function drawpaths(min, max)
@@ -544,12 +542,12 @@ function drawCluster(min, max)
 }
 
 var checked = [];
-checked[0] = "checked";
-checked[1] = "checked";
-checked[2] = "checked";
-checked[3] = "checked";
-checked[4] = "checked";
-checked[5] = "checked";
+checked[0] = "unchecked";
+checked[1] = "unchecked";
+checked[2] = "unchecked";
+checked[3] = "unchecked";
+checked[4] = "unchecked";
+checked[5] = "unchecked";
 
 function handleCheck(number){
 	if(checked[number] == "unchecked")
@@ -561,7 +559,7 @@ function handleCheck(number){
 	else if(checked[number] == "checked")
 	{
 		checked[number] = "unchecked";
-		document.getElementById('checkbox'+number).style.opacity = '0.4';
+		document.getElementById('checkbox'+number).style.opacity = '0.5';
 		document.getElementById('checkbox'+number).style.border = '';
 	}
 	drawTrafficBehavior(hourMin, hourMax);
@@ -574,7 +572,6 @@ function trafficBehavior(min, max)
 {
 	currentView = "behavior";
 
-
 	/****************Content of infobox****************
 	****************************************************/
 
@@ -585,8 +582,10 @@ function trafficBehavior(min, max)
 	
 	//check all checkboxes
 	for (var i = 0; i < checked.length; i++) {
-		checked[i] = "checked";
+		checked[i] = "unchecked";
 	}
+
+	var boxOpacity = 0.5;
 
 	/****************checkboxes******************/
 	infobox.innerHTML += '<div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div>';
@@ -594,42 +593,42 @@ function trafficBehavior(min, max)
 	document.getElementById('checkbox0').style.height = '20px';
 	document.getElementById('checkbox0').style.width = '20px';
 	document.getElementById('checkbox0').style.borderRadius='5px';
-	document.getElementById('checkbox0').style.border = '1px solid';
+	document.getElementById('checkbox0').style.opacity = boxOpacity;
 
 	infobox.innerHTML += '<div class="checkboxes" id="checkbox1" onclick="handleCheck('+1+')"></div>';
 	document.getElementById('checkbox1').style.backgroundColor = "#377eb8";
 	document.getElementById('checkbox1').style.height = '20px';
 	document.getElementById('checkbox1').style.width = '20px';
 	document.getElementById('checkbox1').style.borderRadius='5px';
-	document.getElementById('checkbox1').style.border = '1px solid';
+	document.getElementById('checkbox1').style.opacity = boxOpacity;
 
 	infobox.innerHTML += '<div class="checkboxes" id="checkbox2" onclick="handleCheck('+2+')"></div>';
 	document.getElementById('checkbox2').style.backgroundColor = "#a65628";
 	document.getElementById('checkbox2').style.height = '20px';
 	document.getElementById('checkbox2').style.width = '20px';
 	document.getElementById('checkbox2').style.borderRadius='5px';
-	document.getElementById('checkbox2').style.border = '1px solid';
+	document.getElementById('checkbox2').style.opacity = boxOpacity;
 
 	infobox.innerHTML += '<div class="checkboxes" id="checkbox3" onclick="handleCheck('+3+')"></div>';
 	document.getElementById('checkbox3').style.backgroundColor = "#984ea3";
 	document.getElementById('checkbox3').style.height = '20px';
 	document.getElementById('checkbox3').style.width = '20px';
 	document.getElementById('checkbox3').style.borderRadius='5px';
-	document.getElementById('checkbox3').style.border = '1px solid';
+	document.getElementById('checkbox3').style.opacity = boxOpacity;
 
 	infobox.innerHTML += '<div class="checkboxes" id="checkbox4" onclick="handleCheck('+4+')"></div>';
 	document.getElementById('checkbox4').style.backgroundColor = "#ff7f00";
 	document.getElementById('checkbox4').style.height = '20px';
 	document.getElementById('checkbox4').style.width = '20px';
 	document.getElementById('checkbox4').style.borderRadius='5px';
-	document.getElementById('checkbox4').style.border = '1px solid';
+	document.getElementById('checkbox4').style.opacity = boxOpacity;
 
 	infobox.innerHTML += '<div class="checkboxes" id="checkbox5" onclick="handleCheck('+5+')"></div>';
 	document.getElementById('checkbox5').style.backgroundColor = "#ffff33";
 	document.getElementById('checkbox5').style.height = '20px';
 	document.getElementById('checkbox5').style.width = '20px';
 	document.getElementById('checkbox5').style.borderRadius='5px';
-	document.getElementById('checkbox5').style.border = '1px solid';
+	document.getElementById('checkbox5').style.opacity = boxOpacity;
 	/************end of checkboxes**************/
 
 
