@@ -313,29 +313,39 @@ function drawInfobox()
 {
 	clearBox('infobox');
 
-	infobox.innerHTML += '<p>Traffic in Milano colored by velocity</p>'
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes2" id="checkboxSpeed0"></div></td><td><p>< 10 km/h</p></td></tr></table>';
+	var checkboxDivs ="";
+
+	infobox.innerHTML = '<p>Traffic in Milano colored by velocity</p>'
+
+	checkboxDivs += '<tr><td><div class="checkboxes2" id="checkboxSpeed0"></div></td><td><div id="checkboxDiv">< 10 km/h</div></td></tr>';	
+
+	checkboxDivs += '<tr><td><div class="checkboxes2" id="checkboxSpeed1"></div></td><td><div id="checkboxDiv">10-30 km/h</div></td></tr>';
+
+	checkboxDivs += '<tr><td><div class="checkboxes2" id="checkboxSpeed2"</div></td><td><div id="checkboxDiv">30-90 km/h</div></td></tr>';
+
+	checkboxDivs += '<tr><td><div class="checkboxes2" id="checkboxSpeed3"></div></td><td><div id="checkboxDiv"> > 90 km/h</div></td></tr>';
+	
+
+	infobox.innerHTML += '<div id = "checkboxesDiv">'+'<table>' + checkboxDivs + '</table>' + '</div>';
+
 	document.getElementById('checkboxSpeed0').style.backgroundColor = "#F00";
 	document.getElementById('checkboxSpeed0').style.height = '20px';
 	document.getElementById('checkboxSpeed0').style.width = '20px';
 	document.getElementById('checkboxSpeed0').style.borderRadius='5px';
 	document.getElementById('checkboxSpeed0').style.border = '1px solid';
 
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes2" id="checkboxSpeed1"></div></td><td><p>10-30 km/h</p></td></tr></table>';
 	document.getElementById('checkboxSpeed1').style.backgroundColor = "#e59400";
 	document.getElementById('checkboxSpeed1').style.height = '20px';
 	document.getElementById('checkboxSpeed1').style.width = '20px';
 	document.getElementById('checkboxSpeed1').style.borderRadius='5px';
 	document.getElementById('checkboxSpeed1').style.border = '1px solid';
 
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes2" id="checkboxSpeed2"</div></td><td><p>30-90 km/h</p></td></tr></table>';
 	document.getElementById('checkboxSpeed2').style.backgroundColor = "#FF0";
 	document.getElementById('checkboxSpeed2').style.height = '20px';
 	document.getElementById('checkboxSpeed2').style.width = '20px';
 	document.getElementById('checkboxSpeed2').style.borderRadius='5px';
 	document.getElementById('checkboxSpeed2').style.border = '1px solid';
 
-	infobox.innerHTML += '<table><tr><td><div class="checkboxes2" id="checkboxSpeed3"></div></td><td><p> > 90 km/h</p></td></tr></table>';
 	document.getElementById('checkboxSpeed3').style.backgroundColor = "#0F0";
 	document.getElementById('checkboxSpeed3').style.height = '20px';
 	document.getElementById('checkboxSpeed3').style.width = '20px';
@@ -761,7 +771,7 @@ function trafficBehavior(min, max)
 	/****************checkboxes******************/
 	var checkboxDivs = "";
 
-	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars passing by Milano</div></td></tr>';
+	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div></td><td><div style="height: 18px; font-family: sans-serif; font-size: 13px;">Cars passing by Milano</div></td></tr>';
 	
 	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox1" onclick="handleCheck('+1+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars never leaving the core of Milano</div></td></tr>';
 
