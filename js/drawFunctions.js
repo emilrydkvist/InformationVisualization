@@ -151,7 +151,9 @@ function drawCurrent(min, max){
 function drawpathsInfo()
 {
 	clearBox('infobox');
-	document.getElementById('infobox').innerHTML = '<p>The blue lines on the map each represents the trajectory of a car.'+ 
+	var box = document.getElementById('infobox');
+	box.innerHTML = '<div id="title">All trajectories</div>';
+	box.innerHTML += '<p>The blue lines on the map each represents the trajectory of a car.'+ 
 	'The dataset which this visualization is based upon contains gps-data from 1239 cars that have been driving around Milano. <br/>'+ 
 	'This view is not very useful but is quite beuatiful to look at. <br/><br/>'+ 
 	'You can use the interactive timeline at any time to filter the data.</p>';
@@ -220,7 +222,7 @@ function drawPathSpeed(min, max){
 
 	$("#loading").show();
 	document.getElementById('loading').style.visibility = 'visible';
-	setTimeout(loop, 5);
+	setTimeout(loop, 10);
 
 	function loop()
 	{
@@ -245,27 +247,6 @@ function drawPathSpeed(min, max){
 					
 					var velocity = distance/time*3.6;
 
-					/*//Cars driving in 10km/h or less
-					if(checkedSpeed[0] == "checked" && velocity < 10){
-						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-					}
-					//Cars driving between 10 and 30 km/h
-					else if(checkedSpeed[1] == "checked" && velocity >= 10 && velocity < 30){
-						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-					}
-					//Cars driving between 30 and 90 km/h
-					else if(checkedSpeed[2] == "checked" && velocity >= 30 && velocity < 90){
-						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-					}
-					//Cars driving in 90km/h or more
-					else if(checkedSpeed[3] == "checked" && velocity >= 90){
-						paths.push(new google.maps.LatLng(carData[i][j]['lat'], carData[i][j]['lon']));	
-						paths.push(new google.maps.LatLng(carData[i][j+1]['lat'], carData[i][j+1]['lon']));	
-					}*/
-
 					var path = new google.maps.Polyline({
 					  path: paths,
 					  geodesic: true,
@@ -283,27 +264,6 @@ function drawPathSpeed(min, max){
 		document.getElementById('loading').style.visibility = 'hidden';
 
 		//Update infobox
-
-		//Create the squares
-		/*var squares = '<rect x="20" y="100" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#F00"></rect>'+
-		'<rect x="20" y="140" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#e59400"></rect>'+ 
-		'<rect x="20" y="180" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#FF0"></rect>'+
-		'<rect x="20" y="220" rx="5" ry="5" width="20" height="20" stroke="black" stroke-width="1" fill="#0F0"></rect>';
-
-		var title = '<p>Current view: Car speeds </p>';
-
-		var textList = '<li> < 7 km/h </li>'+ '<li> 7-30 km/h </li>'+ '<li> 30-90 km/h </li>'+ '<li> > 90 km/h </li>';
-		var list = '<ol>' + textList + '</ol>';
-		//<rect x="20" y="180" rx="10" ry="10" width="30" height="30" fill="#FF0"/>
-
-		//Create the receptacle for the squares
-		var receptacle = document.getElementById('infobox');
-
-		//Wrap the svg string to a svg object
-		var svgfragment = '<svg>' + squares + '</svg>';
-
-		//Add the svg to the div
-		receptacle.innerHTML='' + title + svgfragment + list ;*/
 
 	}
 			
@@ -343,34 +303,19 @@ function drawInfobox()
 	document.getElementById('checkboxSpeed3').style.border = '1px solid';
 }
 
-/*
-var checkedSpeed = [];
-checkedSpeed[0] = "checked";
-checkedSpeed[1] = "checked";
-checkedSpeed[2] = "checked";
-checkedSpeed[3] = "checked";
 
-function handleCheckSpeed(number){
-	if(checkedSpeed[number] == "unchecked")
-	{
-		checkedSpeed[number]="checked";
-		document.getElementById('checkboxSpeed'+number).style.opacity = '1';
-		document.getElementById('checkboxSpeed'+number).style.border = '1px solid';
-	}
-	else if(checkedSpeed[number] == "checked")
-	{
-		checkedSpeed[number] = "unchecked";
-		document.getElementById('checkboxSpeed'+number).style.opacity = '0.5';
-		document.getElementById('checkboxSpeed'+number).style.border = '';
-	}
-	drawPathSpeed(hourMin, hourMax);
-}*/
+function animateInfo()
+{
+	var box = document.getElementById('infobox');
+	box.innerHTML = '<div id="title">Car animation</div>';
+	box.innerHTML += '<p>Each black dot represents a car travelling in its trajectory.'+
+	' This view animates 100 cars. <br/><br/>'+
+	'Don\'t forget to try the interactive timeline.</p>';
+}
 
 function animatePaths(min, max){
 
 	currentView = "animate";
-
-	clearBox('infobox');
 
 	var hourMin = min||0;
 	var hourMax = max||24;
@@ -503,8 +448,8 @@ function drawSlowTraffic(min, max){
 						var path = new google.maps.Polyline({
 						  path: paths,
 						  geodesic: true,
-						  strokeColor: directionToColor(direction),
-						  strokeOpacity: 0.8,
+						  strokeColor: '#F00',
+						  strokeOpacity: 0.2,
 						  strokeWeight: 2,
 						});
 
