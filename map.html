@@ -17,11 +17,11 @@
   		<li><img src="img/arrowDown.png" alt="arrow down"></li>
 		<li><button id="button" onclick="animatePaths(hourMin, hourMax);animateInfo();">Car animation</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
-		<li><button id="button" onclick="drawPathSpeed(hourMin, hourMax);drawInfobox();">Velocity</button></li>
+		<li><button id="button" onclick="drawPathSpeed(hourMin, hourMax);drawSpeedInfo();">Velocity</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
 		<li><button id="button" onclick="drawSlowTraffic(hourMin, hourMax); slowTrafficInfo();">Low speed events</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
-		<li><button id="button" onclick="calculateCluster(hourMin, hourMax)">Tailback areas</button></li>
+		<li><button id="button" onclick="calculateCluster(hourMin, hourMax);clusterInfo();">Tailback areas</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
 		<li><button id="button" onclick="trafficBehavior(hourMin, hourMax)">Traffic movement</button></li>
 	</ol>
@@ -121,7 +121,10 @@
 			
 		});
 
-		document.getElementById('infobox').innerHTML = "<p>Welcome to this javascript visualization of the traffic in Milano. <br/> This webpage is a project in the course \'Information Visualization\' at Linköpings University. <br/><br/></p>";
+		document.getElementById('infobox').innerHTML = '<div id="title">Welcome</div>';
+
+
+		document.getElementById('infobox').innerHTML += "<p>This webpage contains a javascript visualization of the traffic in Milano. <br/> The webpage was created as a project in the course \'Information Visualization\' at Linköpings University. <br/><br/></p>";
 
 		//Function for drawing brush
 		function drawBrush()

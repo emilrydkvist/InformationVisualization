@@ -155,8 +155,8 @@ function drawpathsInfo()
 	box.innerHTML = '<div id="title">All trajectories</div>';
 	box.innerHTML += '<p>The blue lines on the map each represents the trajectory of a car.'+ 
 	'The dataset which this visualization is based upon contains gps-data from 1239 cars that have been driving around Milano. <br/>'+ 
-	'This view is not very useful but is quite beuatiful to look at. <br/><br/>'+ 
-	'You can use the interactive timeline at any time to filter the data.</p>';
+	'This view is not very useful but is quite beautiful to look at. <br/><br/>'+ 
+	'You can mark an area of the interactive timeline at any time to filter the data.</p>';
 }
 
 function drawpaths(min, max)
@@ -269,20 +269,22 @@ function drawPathSpeed(min, max){
 			
 }
 
-function drawInfobox()
+function drawSpeedInfo()
 {
 	clearBox('infobox');
 
+	var infobox = document.getElementById('infobox');
+
+	infobox.innerHTML = '<div id="title">Velocity</div>';
+
+	infobox.innerHTML += '<p>The trajectories in this view of the map are colored by their velocities. '+
+	'As you can see, the cars on the highways travels a lot faster than the cars in the core of Milano.</p>';
+
 	var checkboxDivs ="";
 
-	infobox.innerHTML = '<p>Traffic in Milano colored by velocity</p>'
-
 	checkboxDivs += '<tr><td><div class="checkboxes2" id="checkboxSpeed0"></div></td><td><div id="checkboxDiv">< 10 km/h</div></td></tr>';	
-
 	checkboxDivs += '<tr><td><div class="checkboxes2" id="checkboxSpeed1"></div></td><td><div id="checkboxDiv">10-30 km/h</div></td></tr>';
-
 	checkboxDivs += '<tr><td><div class="checkboxes2" id="checkboxSpeed2"</div></td><td><div id="checkboxDiv">30-90 km/h</div></td></tr>';
-
 	checkboxDivs += '<tr><td><div class="checkboxes2" id="checkboxSpeed3"></div></td><td><div id="checkboxDiv"> > 90 km/h</div></td></tr>';
 	
 
@@ -318,9 +320,9 @@ function animateInfo()
 {
 	var box = document.getElementById('infobox');
 	box.innerHTML = '<div id="title">Car animation</div>';
-	box.innerHTML += '<p>Each black dot represents a car travelling in its trajectory.'+
+	box.innerHTML += '<p>Each black dot represents a car travelling along its historical trajectory.'+
 	' This view animates 100 cars. <br/><br/>'+
-	'Don\'t forget to try the interactive timeline.</p>';
+	'The next view is quite heavy to calculate, please be patient.</p>';
 }
 
 function animatePaths(min, max){
@@ -468,7 +470,7 @@ function drawSlowTraffic(min, max){
 						  geodesic: true,
 						  strokeColor: '#F00',
 						  strokeOpacity: 0.2,
-						  strokeWeight: 2,
+						  strokeWeight: 1,
 						});
 
 						//The path is drawn
@@ -483,6 +485,16 @@ function drawSlowTraffic(min, max){
 	}
 }
 
+
+function clusterInfo()
+{
+	var box = document.getElementById('infobox');
+	box.innerHTML = '<div id="title">Tailback areas</div>';
+	box.innerHTML += '<p>Based on the density of slow cars in certain areas, this view shows which areas have the highest possibility for tailbacks. '+
+	'As you would expect, most of these areas are positioned around crossroads. '+
+	'<br/>If you are in a hurry, you might want to avoid these areas. <br/><br/>'+
+	'</p>';
+}
 
 function calculateCluster(min, max){
 
@@ -712,7 +724,9 @@ function trafficBehavior(min, max)
 	clearBox('infobox');
     var infobox = document.getElementById('infobox');
 
-    infobox.innerHTML = '<p>This view visualizes how much traffic is added to Milano\'s core during a day. Out of '+carData.length+' cars, '+carsInCore+' enters the core of Milano and adds to the traffic that is already there. <br/><br/>Click the boxes below to see how cars travel around the core of Milano.</p>';
+    infobox.innerHTML = '<div id="title">Traffic movement</div>';
+
+    infobox.innerHTML += '<p>This view visualizes how much traffic is added to Milano\'s core during a day. Out of '+carData.length+' cars, '+carsInCore+' enters the core of Milano and adds to the traffic that is already there. <br/><br/>Click the boxes below to see how cars travel around the core of Milano.</p>';
 	
 	//check all checkboxes
 	for (var i = 0; i < checked.length; i++) {
@@ -725,15 +739,10 @@ function trafficBehavior(min, max)
 	var checkboxDivs = "";
 
 	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox0" onclick="handleCheck('+0+')"></div></td><td><div style="height: 18px; font-family: sans-serif; font-size: 13px;">Cars passing by Milano</div></td></tr>';
-	
 	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox1" onclick="handleCheck('+1+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars never leaving the core of Milano</div></td></tr>';
-
 	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox2" onclick="handleCheck('+2+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars entering the core of Milano and staying</div></td></tr>';
-
 	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox3" onclick="handleCheck('+3+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars leaving the core of Milano</div></td></tr>';
-
-	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox4" onclick="handleCheck('+4+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars passing through the core of Milano</div></td></tr>';
-
+	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox4" onclick="handleCheck('+4+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars driving through the core of Milano</div></td></tr>';
 	checkboxDivs += '<tr><td><div class="checkboxes" id="checkbox5" onclick="handleCheck('+5+')"></div></td><td><div style="height: 30px; font-family: sans-serif; font-size: 13px;">Cars leaving and returning to the core of Milano</div></td></tr>';
 
 	infobox.innerHTML += '<table>'+checkboxDivs+'</table>';
