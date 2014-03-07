@@ -397,6 +397,14 @@ function animateCircle(path) {
 	}, 30);
 }
 
+function slowTrafficInfo()
+{
+	var box = document.getElementById('infobox');
+	box.innerHTML = '<div id="title">Low speed events</div>';
+	box.innerHTML += '<p>The red lines on the map each represents the trajectory of a car where its velocity is less than 10 km/h. <br/>'+
+	'This visualization is interesting because it makes it possible to see where potential tailbacks can occur. <br/><br/>Tailbacks are visulized in the next view. </p>';
+}
+
 function drawSlowTraffic(min, max){
 
 	currentView = "slowTraffic"; 
