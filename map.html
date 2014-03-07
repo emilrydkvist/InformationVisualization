@@ -7,7 +7,7 @@
   </head>
   <body>
   	<div id="header">
-  		<h2><a href="map.html">Information visualization of traffic in Milano</a></h2>
+  		<a href="map.html">Milano traffic visualization</a>
   	</div>
   <div id="container">
   	
@@ -15,15 +15,15 @@
   		<li><p>START HERE<p></li>
   		<li><button id="button" onclick="drawpaths(hourMin, hourMax); drawpathsInfo();">All trajectories</button></li>
   		<li><img src="img/arrowDown.png" alt="arrow down"></li>
-		<li><button id="button" onclick="animatePaths(hourMin, hourMax)">Car animation</button></li>
+		<li><button id="button" onclick="animatePaths(hourMin, hourMax);animateInfo();">Car animation</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
-		<li><button id="button" onclick="drawPathSpeed(hourMin, hourMax);drawInfobox();">Show car speed</button></li>
+		<li><button id="button" onclick="drawPathSpeed(hourMin, hourMax);drawInfobox();">Velocity</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
 		<li><button id="button" onclick="drawSlowTraffic(hourMin, hourMax)">Low speed events</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
-		<li><button id="button" onclick="calculateCluster(hourMin, hourMax)">Potential tailback areas</button></li>
+		<li><button id="button" onclick="calculateCluster(hourMin, hourMax)">Tailback areas</button></li>
 		<li><img src="img/arrowDown.png" alt="arrow down"></li>
-		<li><button id="button" onclick="trafficBehavior(hourMin, hourMax)">Added traffic</button></li>
+		<li><button id="button" onclick="trafficBehavior(hourMin, hourMax)">Traffic movement</button></li>
 	</ol>
 
 	<div id="timeline"></div>
@@ -153,9 +153,9 @@
 				.call(timeAxis)
 				.append("text")
 				.attr("class", "label")
-				.attr("x", (width/2)-30)
+				.attr("x", (width/2)-55)
 				.attr("y", -10)
-				.text("Timeline");
+				.text("Interactive Timeline");
 
 			//Create brush
 			var brush = d3.svg.brush();
